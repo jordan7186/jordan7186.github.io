@@ -1,4 +1,4 @@
 User-agent: *
 Disallow:
 
-Sitemap: https://jordan7186.github.io/jordan7186.github.io/sitemap.xml
+Sitemap: https://jordan7186.github.io/sitemap.xml
