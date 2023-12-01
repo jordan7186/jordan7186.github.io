@@ -13,14 +13,23 @@ profile:
     <p>123 your address street</p>
     <p>Your City, State 12345</p>
 
-news: true  # includes a list of news items
+news: false # includes a list of news items
 latest_posts: true  # includes a list of the newest posts
 selected_papers: true # includes a list of papers marked as "selected={true}"
-social: true  # includes social icons at the bottom of the page
+social: false # includes social icons at the bottom of the page
 ---
 
-Write your biography here. Tell the world about yourself. Link to your favorite [subreddit](http://reddit.com). You can put a picture in, too. The code is already in, just name your picture `prof_pic.jpg` and put it in the `img/` folder.
+Hello! I am a Ph.D candidate in [MIDaS Lab](https://sites.google.com/site/midasyonsei) led by *Prof. Won-Yong Shin*, [Dept. Computer Science & Engineering](https://cse.yonsei.ac.kr/cse/index.do) in Yonsei University, South Korea. Before joining MIDaS, I graduated from Yonsei University in Feb. 2019 as a physics major. 
 
-Put your address / P.O. box / other info right below your picture. You can also disable any of these elements by editing `profile` property of the YAML header of your `_pages/about.md`. Edit `_bibliography/papers.bib` and Jekyll will render your [publications page](/al-folio/publications/) automatically.
+My primary interest is to find elegant and simple solutions to interesting and important problems on **graph data** and **graph neural networks (GNNs).** More specifically, my main research topics are currently focused on…
 
-Link to your social media connections, too. This theme is set up to use [Font Awesome icons](https://fontawesome.com/) and [Academicons](https://jpswalsh.github.io/academicons/), like the ones below. Add your Facebook, Twitter, LinkedIn, Google Scholar, or just disable all of them.
+- **Explainabiliy** in graph neural networks
+- **Efficient** graph learning
+
+I also have research experiences in…
+
+- **Time-series with INR**
+- **Graph representation learning**
+- **Explainable healthcare**
+
+
