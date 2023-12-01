@@ -2,20 +2,19 @@
 layout: about
 title: about
 permalink: /
-subtitle: <a href='#'>Affiliations</a>. Address. Contacts. Moto. Etc.
+subtitle: <a href='https://www.linkedin.com/in/yongminshin/'>LinkedIn.</a><a href='https://twitter.com/YongminWavyShin'>Twitter.</a><a href='https://github.com/jordan7186'>Github.</a>
 
 profile:
   align: right
-  image: prof_pic.jpg
+  image: profile.jpg
   image_circular: false # crops the image to make it circular
   more_info: >
-    <p>555 your office number</p>
-    <p>123 your address street</p>
-    <p>Your City, State 12345</p>
+    <p>jordan3414@yonsei.ac.kr</p>
+    <p>Seoul, South Korea</p>
 
 news: false # includes a list of news items
-latest_posts: true  # includes a list of the newest posts
 selected_papers: true # includes a list of papers marked as "selected={true}"
+latest_posts: true  # includes a list of the newest posts
 social: false # includes social icons at the bottom of the page
 ---
 
