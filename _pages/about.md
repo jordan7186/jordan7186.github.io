@@ -2,7 +2,7 @@
 layout: about
 title: about
 permalink: /
-subtitle: <a href='https://www.linkedin.com/in/yongminshin/'>LinkedIn.</a><a href='https://twitter.com/YongminWavyShin'>Twitter.</a><a href='https://github.com/jordan7186'>Github.</a>
+subtitle: <a href='https://www.linkedin.com/in/yongminshin/'>LinkedIn,</a><a href='https://twitter.com/YongminWavyShin'>Twitter,</a><a href='https://github.com/jordan7186'>Github</a>
 
 profile:
   align: right
@@ -31,4 +31,4 @@ I also have research experiences in…
 - **Graph representation learning**
 - **Explainable healthcare**
 
-
+Here is my formal <a href="https://drive.google.com/file/d/1UhefwaijAm7FC312RY2UYLxnRH0jNrqY/view?usp=sharing">CV</a>!
