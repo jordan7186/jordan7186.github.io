@@ -119,9 +119,9 @@ bing_site_verification:  # out your bing-site-verification ID (Bing Webmaster)
 # Blog
 # -----------------------------------------------------------------------------
 
-blog_name: Graph Learning Stuff # blog_name will be displayed in your blog page
+blog_name: Graph Learning Blog # blog_name will be displayed in your blog page
 blog_nav_title: Blog # your blog must have a title for it to be displayed in the nav bar
-blog_description: Sometimes I randomly experiment something and write about it 
+blog_description: Some random experiments, just for fun!
 permalink: /blog/:year/:title/
 
 # Pagination
