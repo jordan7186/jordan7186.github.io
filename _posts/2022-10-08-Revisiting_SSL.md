@@ -7,7 +7,7 @@ giscus_comments: true
 date: 2022-10-08
 featured: true
 categories: ClassicalMethods
-related_publications: Zhou2003labelprop
+related_publications: Zhou2003labelprop, Yang2016planetoid
 toc:
   sidebar: left
 # Below is an example of injecting additional post-specific styles.
@@ -17,7 +17,7 @@ toc:
 
 ## Introduction
 
-Semi-supervised learning (SSL) is one of the most widely studied tasks in machine learning. As the ‘supervised’ part of the name suggessts, data instances are accompanied by its labels, which are sereved as the ground-truth. However, ‘semi’ suggests that not all given instance are learned by supervised learning, but rather a (small) portion of it also have access its ground-truth labels by the model. In the context of graph learning, the task of (semi-supervised) node classification is of the main concern for many research papers. The history to solve this task goes quite a way back, one of which is <d-cite key="Zhou2003labelprop"></d-cite>, published back in 2003, before the era of machine learning.
+Semi-supervised learning (SSL) is one of the most widely studied tasks in machine learning. As the ‘supervised’ part of the name suggessts, data instances are accompanied by its labels, which are sereved as the ground-truth. However, ‘semi’ suggests that not all given instance are learned by supervised learning, but rather a (small) portion of it also have access its ground-truth labels by the model. In the context of graph learning, the task of (semi-supervised) node classification is of the main concern for many research papers. The history to solve this task goes quite a way back, one of which is (Zhou et al., 2003), published back in 2003, before the era of machine learning.
 
 In this post, I will revisit this classic method and apply to one of the more modern benchmark datasets, and try to see what analysis can be done to gain some insights.
 
@@ -33,11 +33,11 @@ However, since we are interested in applying the main algorithm in modern **grap
 
 The algorithm itself is first described as an iterative process. Going a bit formal, let us define some terms here:
 
-- Denote $n$ as the number of datapoints (which is equal to the number of **nodes** if we interpret the dataset as a graph).
-- As we deal with graph datasets, we can assume that the adjacency matrix $A \in \mathcal{R}^{n \times n}$ is given. (Separately constructed as an affinity matrix in [1])
-- Assume each nodes are assigned to one of $c$ classes, which we express as a one-hot encoded vector.
-- The matrix $\mathcal{Y} \in \mathcal{R}^{n \times c}$ represents the class information for all nodes in the dataset.
-- The task is to generate a good prediction matrix $\mathcal{F} \in \mathbb{R}^{n \times c}$, where the actual predicted class is considered as the index of the highest value for each row: $y_i = \text{arg} \max_{j} \mathcal{F}_{ij}$.
+- Denote $$n$$ as the number of datapoints (which is equal to the number of **nodes** if we interpret the dataset as a graph).
+- As we deal with graph datasets, we can assume that the adjacency matrix $$A \in \mathcal{R}^{n \times n}$$ is given. (Separately constructed as an affinity matrix in [1])
+- Assume each nodes are assigned to one of $$c$$ classes, which we express as a one-hot encoded vector.
+- The matrix $$\mathcal{Y} \in \mathcal{R}^{n \times c}$$ represents the class information for all nodes in the dataset.
+- The task is to generate a good prediction matrix $$\mathcal{F} \in \mathbb{R}^{n \times c}$$, where the actual predicted class is considered as the index of the highest value for each row: $$y_i = \text{arg} \max_{j} \mathcal{F}_{ij}$$.
 
 
 ### Commonly used assumption in SSL 
@@ -53,17 +53,17 @@ which tends to be effective for quite a lot of cases.
 
 ### Algorithm
 
-The two ideas (direct loss and similarity assumption) are directly represented in the algorithm, where it can be written as an iterative procedure in the $t$-th step:
+The two ideas (direct loss and similarity assumption) are directly represented in the algorithm, where it can be written as an iterative procedure in the $$t$$-th step:
 
 $$
 \mathcal{F}(t+1) = \alpha A \mathcal{F}(t) + (1-\alpha)\mathcal{Y}.
 $$
 
-Dissecting each term, we can recover each of the ideas directly. Starting from the second term, $(1-\alpha)\mathcal{Y}$ basically just asserts the label information (at least the available ones) into $\mathcal{F}(t+1)$ (Idea 1). Now the first term, $\alpha A \mathcal{F}(t)$, basically reuse the sum (scaled down by $(1-\alpha)$) of what their neighbor says (Idea 2).  Here, we implicitly defined the notion of ‘similar’ in the graph case: Connected nodes are close to each other. This assumption also works well for other graph laerning.
+Dissecting each term, we can recover each of the ideas directly. Starting from the second term, $$(1-\alpha)\mathcal{Y}$$ basically just asserts the label information (at least the available ones) into $$\mathcal{F}(t+1)$$ (Idea 1). Now the first term, $$\alpha A \mathcal{F}(t)$$, basically reuse the sum (scaled down by $$(1-\alpha)$$) of what their neighbor says (Idea 2).  Here, we implicitly defined the notion of ‘similar’ in the graph case: Connected nodes are close to each other. This assumption also works well for other graph laerning.
 
 ### Limit case
 
-The nice thing about this formulation is that, we can directly calculate $\lim_{t \rightarrow \infty} \mathcal{F}(t)$ analytically. The math itself is also quite straightforward, and the asymptotic result is:
+The nice thing about this formulation is that, we can directly calculate $$\lim_{t \rightarrow \infty} \mathcal{F}(t)$$ analytically. The math itself is also quite straightforward, and the asymptotic result is:
 
 $$
 \lim_{t \rightarrow \infty} \mathcal{F}(t) = (I - \alpha S)^{-1} Y
@@ -72,7 +72,7 @@ $$
 
 ## Application to Cora
 
-Cora is perhaps the most used graph benchmark dataset for evaluating on node or edge level tasks (popularized by <d-cite key="Yang2016planetoid"></d-cite>). As mentioned, we will only use the graph structure data as the algorithm does not accept node feature as input.
+Cora is perhaps the most used graph benchmark dataset for evaluating on node or edge level tasks (popularized by (Yang et al., 2016). As mentioned, we will only use the graph structure data as the algorithm does not accept node feature as input.
 
 We will use [pytorch](https://pytorch.org/) and [pytorch geometric](https://pytorch-geometric.readthedocs.io/) as our base framework.
 
@@ -170,7 +170,7 @@ Plotting all experiment sessions in which we perform experiments with different 
 
 <div class="row mt-3">
     <div class="col-sm mt-3 mt-md-0">
-        {% include figure.html path="assets/img/blog1_1.jpg" class="img-fluid rounded z-depth-1" %}
+        {% include figure.html path="/assets/img/blog1_1.jpg" class="img-fluid rounded z-depth-1" %}
     </div>
 </div>
 <div class="caption">
@@ -184,7 +184,7 @@ According to this result, there are some interesting characteristics that we can
 
 ## Implementation 2: Analytic limit solution
 
-Now, we will implement the solution by taking the iteration $t$ to $\infty$. This is even more straightfoward:
+Now, we will implement the solution by taking the iteration $$t$$ to $$\infty$$. This is even more straightfoward:
 
 {% highlight python %}
 # Direct calculation of limit solution
@@ -209,9 +209,10 @@ for alpha in alpha_list:
 
 Again, plotting all results of the limit solution version as a plot results in:
 
+
 <div class="row mt-3">
     <div class="col-sm mt-3 mt-md-0">
-        {% include figure.html path="assets/img/blog1_2.jpg" class="img-fluid rounded z-depth-1" %}
+        {% include figure.html path="assets/img/blog1_2.png" class="img-fluid rounded z-depth-1" %}
     </div>
 </div>
 <div class="caption">
@@ -221,13 +222,13 @@ Again, plotting all results of the limit solution version as a plot results in:
 From this plot, we also observe some characteristics:
 
 - The effect of alpha is consisent with that of Figure 1.
-- The plot also shows the performance of only using the feature information of Cora by training a two-layer MLP model. Although the performance is not that bad (considering only using a part of the model + simple model), [1] still outperforms. This implies that the neighbor information is more vital than the node feature information.
+- The plot also shows the performance of only using the feature information of Cora by training a two-layer MLP model. Although the performance is not that bad (considering only using a part of the model + simple model), (Zhou et al., 2003) still outperforms. This implies that the neighbor information is more vital than the node feature information.
 
 Additionally, we can plot the asymtotic behavior of the iteative algorithm:
 
 <div class="row mt-3">
     <div class="col-sm mt-3 mt-md-0">
-        {% include figure.html path="assets/img/blog1_3.jpg" class="img-fluid rounded z-depth-1" %}
+        {% include figure.html path="/assets/img/blog1_3.png" class="img-fluid rounded z-depth-1" %}
     </div>
 </div>
 <div class="caption">
