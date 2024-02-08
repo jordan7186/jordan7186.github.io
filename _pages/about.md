@@ -12,7 +12,7 @@ profile:
     <p>jordan3414@yonsei.ac.kr</p>
     <p>Seoul, South Korea</p>
 
-news: false # includes a list of news items
+news: true # includes a list of news items
 selected_papers: true # includes a list of papers marked as "selected={true}"
 latest_posts: true  # includes a list of the newest posts
 social: false # includes social icons at the bottom of the page
@@ -27,8 +27,8 @@ My primary interest is to find elegant and simple solutions to interesting and i
 
 I also have research experiences in…
 
-- **Time-series with INR**
-- **Graph representation learning**
-- **Explainable healthcare**
+- Time-series with INR
+- Graph representation learning
+- Explainable healthcare
 
 Here is my formal <a href="https://drive.google.com/file/d/1UhefwaijAm7FC312RY2UYLxnRH0jNrqY/view?usp=sharing">CV</a>!
