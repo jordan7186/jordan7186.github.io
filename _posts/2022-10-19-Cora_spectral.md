@@ -121,7 +121,7 @@ nx.draw(sbm_torch, node_size=50, node_color=node_color)
 
 <div class="row mt-3">
     <div class="col-sm mt-3 mt-md-0">
-        {% include figure.html path="/assets/img/blog2_1.png" class="img-fluid rounded z-depth-1" %}
+        {% include figure.html path="/assets/img/blog2_1.png" class="img-fluid rounded" %}
     </div>
 </div>
 <div class="caption">
@@ -135,7 +135,7 @@ We will use the following quite dramatic but managable graph for decomposition:
 
 <div class="row mt-3">
     <div class="col-sm mt-3 mt-md-0">
-        {% include figure.html path="/assets/img/blog2_2.png" class="img-fluid rounded z-depth-1" %}
+        {% include figure.html path="/assets/img/blog2_2.png" class="img-fluid rounded" %}
     </div>
 </div>
 <div class="caption">
@@ -147,7 +147,7 @@ The eigendecomposition of the unnormalized graph Laplacian $$L = D-A$$ is easilt
 
 <div class="row mt-3">
     <div class="col-sm mt-3 mt-md-0">
-        {% include figure.html path="/assets/img/blog2_3.png" class="img-fluid rounded z-depth-1" %}
+        {% include figure.html path="/assets/img/blog2_3.png" class="img-fluid rounded" %}
     </div>
 </div>
 <div class="caption">
@@ -167,7 +167,7 @@ We can them anticipate the eigenvalues when we slightly modify the graph (see Fi
 
 <div class="row mt-3">
     <div class="col-sm mt-3 mt-md-0">
-        {% include figure.html path="/assets/img/blog2_4.png" class="img-fluid rounded z-depth-1" %}
+        {% include figure.html path="/assets/img/blog2_4.png" class="img-fluid rounded" %}
     </div>
 </div>
 <div class="caption">
@@ -176,7 +176,7 @@ We can them anticipate the eigenvalues when we slightly modify the graph (see Fi
 
 <div class="row mt-3">
     <div class="col-sm mt-3 mt-md-0">
-        {% include figure.html path="/assets/img/blog2_5.png" class="img-fluid rounded z-depth-1" %}
+        {% include figure.html path="/assets/img/blog2_5.png" class="img-fluid rounded" %}
     </div>
 </div>
 <div class="caption">
@@ -199,7 +199,7 @@ Lets straight up visualize $$U$$.
 
 <div class="row mt-3">
     <div class="col-sm mt-3 mt-md-0">
-        {% include figure.html path="/assets/img/blog2_6.png" class="img-fluid rounded z-depth-1" %}
+        {% include figure.html path="/assets/img/blog2_6.png" class="img-fluid rounded" %}
     </div>
 </div>
 <div class="caption">
@@ -212,7 +212,7 @@ However, the eigenvector right next to it ($${\bf u}_2$$, corresponding to the s
 
 <div class="row mt-3">
     <div class="col-sm mt-3 mt-md-0">
-        {% include figure.html path="/assets/img/blog2_7.png" class="img-fluid rounded z-depth-1" %}
+        {% include figure.html path="/assets/img/blog2_7.png" class="img-fluid rounded" %}
     </div>
 </div>
 <div class="caption">
@@ -282,7 +282,7 @@ This is the experimental result to reprocude (NT & Maehara, 2019), where
 
 <div class="row mt-3">
     <div class="col-sm mt-3 mt-md-0">
-        {% include figure.html path="/assets/img/blog2_8.png" class="img-fluid rounded z-depth-1" %}
+        {% include figure.html path="/assets/img/Blog2_8.png" class="img-fluid rounded" %}
     </div>
 </div>
 <div class="caption">
@@ -343,7 +343,7 @@ The expanded experimental results are as follows:
 
 <div class="row mt-3">
     <div class="col-sm mt-3 mt-md-0">
-        {% include figure.html path="/assets/img/blog2_9.png" class="img-fluid rounded z-depth-1" %}
+        {% include figure.html path="/assets/img/blog2_9.png" class="img-fluid rounded" %}
     </div>
 </div>
 <div class="caption">
