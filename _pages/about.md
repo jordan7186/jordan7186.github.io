@@ -1,6 +1,6 @@
 ---
 layout: about
-title: about
+title: About
 permalink: /
 subtitle: <a href='https://www.linkedin.com/in/yongminshin/'>LinkedIn,</a><a href='https://twitter.com/YongminWavyShin'>Twitter,</a><a href='https://github.com/jordan7186'>Github</a>
 
@@ -10,7 +10,6 @@ profile:
   image_circular: false # crops the image to make it circular
   more_info: >
     <p>jordan3414@yonsei.ac.kr</p>
-    <p>Seoul, South Korea</p>
 
 news: true # includes a list of news items
 selected_papers: true # includes a list of papers marked as "selected={true}"

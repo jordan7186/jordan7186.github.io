@@ -17,10 +17,16 @@ layout: default
             {%- if page.profile.image %}
               {%- assign profile_image_path = page.profile.image | prepend: 'assets/img/' -%}
 
-              {% if page.profile.image_circular %}
+              <!-- {% if page.profile.image_circular %}
                 {%- assign profile_image_class = "img-fluid z-depth-1 rounded-circle" -%}
               {% else %}
                 {%- assign profile_image_class = "img-fluid z-depth-1 rounded" -%}
+              {% endif %} -->
+
+              {% if page.profile.image_circular %}
+                {%- assign profile_image_class = "img-fluid rounded-circle" -%}
+              {% else %}
+                {%- assign profile_image_class = "img-fluid z-depth-2" -%}
               {% endif %}
 
               {% include figure.html
