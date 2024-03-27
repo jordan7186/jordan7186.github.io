@@ -29,5 +29,6 @@ I also have research experiences in…
 - Time-series with INR
 - Graph representation learning
 - Explainable healthcare
+- Recommendation systems
 
 Here is my formal <a href="https://drive.google.com/file/d/1UhefwaijAm7FC312RY2UYLxnRH0jNrqY/view?usp=sharing">CV</a>!
