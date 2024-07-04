@@ -35,6 +35,8 @@ I also have research experiences in…
 ...which are published in conferences like AAAI, IJCAI, SIGIR, LoG, and journals like PAMI, PlosOne, and so on.
 
 I am always open to new ideas and collaborations, so feel free to reach out to me!
+
 Here is my formal <a href="https://drive.google.com/file/d/1UhefwaijAm7FC312RY2UYLxnRH0jNrqY/view?usp=sharing">CV</a> :)
+
 And I also have a <a href="https://yongminshin.simple.ink/">personal blog</a>. Check it out!
 
