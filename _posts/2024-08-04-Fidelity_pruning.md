@@ -79,7 +79,7 @@ Taken quite aback, we had to check the actual fideltiy$$^{-}$$ scores for each m
     </div>
 </div>
 <div class="caption">
-  Fidelity$$^{-}$$ scores for various explanation methods.
+  Fidelity- scores for various explanation methods.
 </div>
 
 In summary, the table suggests that fideltiy$$^{-}$$ scores does not necessarily translate to good graph pruning performances: Especially looking at GNNExplainer, it shows the best fideltiy$$^{-}$$ scores for two datasets, despite being one of the poorest in the graph pruning experiment.
