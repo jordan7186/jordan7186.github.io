@@ -34,7 +34,6 @@ I also have research experiences in…
 
 ...which are published in conferences like AAAI, IJCAI, SIGIR, LoG, and journals like PAMI, PlosOne, and so on.
 
-**I am currently attending the [IJCAI 2024 conference](https://ijcai-24.org/) to present my work on Fidelity-based pruning for GNNs. Check out the [paper](https://arxiv.org/abs/2406.11504v1) and an accompanying [blog post](https://jordan7186.github.io/blog/2024/Fidelity_pruning/)!**
 
 Recently, I am becoming increasingly interested in...
 - Mechanistic Interpretability: I personally think that this is the future of XAI research. I just started to pick up some papers on this topic and I am trying to understand the concept of mechanistic interpretability. As a means to learn more about this topic, I am currently translating several important articles on mechanistic interpretability into Korean. **Check out this [Gitbook](https://lesskorrect.gitbook.io/mechanistic-interpretability) if you are interested!**
