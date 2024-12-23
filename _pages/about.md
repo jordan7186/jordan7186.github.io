@@ -19,11 +19,16 @@ social: false # includes social icons at the bottom of the page
 
 Hello! I am a Ph.D candidate in [MIDaS Lab](https://sites.google.com/site/midasyonsei) led by *Prof. Won-Yong Shin*, [Dept. Computer Science & Engineering](https://cse.yonsei.ac.kr/cse/index.do) in Yonsei University, South Korea. Before joining MIDaS, I graduated from Yonsei University in Feb. 2019 as a physics major. 
 
-My primary interest is to find elegant and simple solutions to interesting and important problems on **graph data** and **graph neural networks (GNNs).** More specifically, my main research topics are currently focused on…
+My primary interest is to find elegant and simple solutions to interesting and important problems on **graph data** and **graph neural networks (GNNs).** More specifically, my main research topics have been focused primarily on…
 
-- **Explainabiliy** in graph neural networks
+- **Explainability** in graph neural networks
 - **Efficient** graph learning
-- And possibly *exploiting* **explanations** to make graph learning more **efficient**!
+
+And my current research focuses on...
+
+- Exploiting explanations from graph learning modules to improve the underlying data
+- Diving into the evaluation protocols for explainability, especially using attention weights
+- Fusion of graph neural networks with large language models
 
 I also have research experiences in…
 
@@ -35,7 +40,7 @@ I also have research experiences in…
 ...which are published in conferences like AAAI, IJCAI, SIGIR, LoG, and journals like PAMI, PlosOne, and so on.
 
 
-Recently, I am becoming increasingly interested in...
+I am always interested in reading about for other research fields, for example in...
 - Mechanistic Interpretability: I personally think that this is the future of XAI research. I just started to pick up some papers on this topic and I am trying to understand the concept of mechanistic interpretability. As a means to learn more about this topic, I am currently translating several important articles on mechanistic interpretability into Korean. **Check out this [Gitbook](https://lesskorrect.gitbook.io/mechanistic-interpretability) if you are interested!**
 - Causal Inference: With the help of Brady Neal's [Introduction to Causal Inference](https://www.bradyneal.com/causal-inference-course), I am trying to understand the concept of causality to understand how it can impact the explainability of machine learning models.
 
