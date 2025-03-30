@@ -9,17 +9,22 @@ nav_order: 3
 
 ## External presentations
 
-## Seminar series @ GIST
+### Seminar series @ GIST
 This is a series of seminars that I gave at Gwangju Institute of Science and Technology (GIST) as a guest speaker from March ~ June 2025. The seminar series was about the basics of graph neural networks, several fundamental concepts, and applications of GNNs.
 
 **(Slides TBA)**
 
-## Seminar @ Ehwa Womans University
+### Seminar @ Ehwa Womans University
 This is a seminar that I gave at Ehwa Womans University as a guest speaker in April 2025.
 
 **(Slides TBA)**
 
-#### PAGE: Prototype-Based Model-Level Explanations for Graph Neural Networks
+### Faithful and Accurate Self-Attention Attribution for Message Passing Neural Networks via the Computation Tree Viewpoint
+This is the poster for my paper "Faithful and Accurate Self-Attention Attribution for Message Passing Neural Networks via the Computation Tree Viewpoint" that was accepted at AAAI 2025. The arxiv version of the paper can be found [here](https://arxiv.org/abs/2406.04612).
+
+Poster: [Faithful and Accurate Self-Attention Attribution for Message Passing Neural Networks via the Computation Tree Viewpoint](/assets/pdf/Poster_final_GAtt.pdf)
+
+### PAGE: Prototype-Based Model-Level Explanations for Graph Neural Networks
 This presentation slides were submitted as an official supplementary material after being accepted as the best academic paper at the Graduate School of Yonsei University.
 
 Slide: [PAGE: Prototype-Based Model-Level Explanations for Graph Neural Networks](/assets/pdf/Presentation_PAGE.pdf)
