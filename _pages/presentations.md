@@ -17,9 +17,7 @@ This is a series of seminars that I gave at Gwangju Institute of Science and Tec
 #### PAGE: Prototype-Based Model-Level Explanations for Graph Neural Networks
 This presentation slides were submitted as an official supplementary material after being accepted as the best academic paper at the Graduate School of Yonsei University.
 
-<div class="embed-container">
-  <iframe src="https://drive.google.com/file/d/1smDo4ntJbIKLKORg3sPr5CmAnlviikZc/view?usp=sharing" width="640" height="360"></iframe>
-</div>
+Slide: [PAGE: Prototype-Based Model-Level Explanations for Graph Neural Networks](/assets/pdf/Presentation_PAGE.pdf)
 
 Also, this is the poster that I presented for the short version, accepted at AAAI 2022.
 
