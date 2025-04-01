@@ -19,7 +19,7 @@ This is a series of seminars that I gave at Gwangju Institute of Science and Tec
 
 This is a seminar that I gave at Ehwa Womans University as a guest speaker in April 2025.
 
-**Slides**: [A practical introduction to (explainable) graph learning][/assets/pdf/Ewha_Uni_lecture.pdf]
+**Slides**: [A practical introduction to (explainable) graph learning](/assets/pdf/Ewha_Uni_lecture.pdf)
 
 ### Faithful and Accurate Self-Attention Attribution for Message Passing Neural Networks via the Computation Tree Viewpoint
 
