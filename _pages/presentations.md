@@ -15,6 +15,8 @@ This is a series of seminars that I gave at Gwangju Institute of Science and Tec
 
 **Session 1:** [Introduction to graph mining and graph neural networks](/assets/pdf/[GIST]01_Introduction_to_graph_mining_and_graph_neural_networks.pdf)
 
+**Session 2:** [On the representational power of graph neural networks](/assets/pdf/[GIST]02_On_the_representational_power_of_graph_neural_networks.pdf)
+
 ### Seminar @ Ehwa Womans University
 
 This is a seminar that I gave at Ehwa Womans University as a guest speaker in April 2025.
