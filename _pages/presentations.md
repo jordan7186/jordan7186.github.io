@@ -19,6 +19,8 @@ This is a series of seminars that I gave at Gwangju Institute of Science and Tec
 
 **Session 3:** [A graph signal processing viewpoint of graph neural networks](/assets/pdf/[GIST]03_A_graph_signal_processing_viewpoint_of_graph_neural_networks.pdf)
 
+**Session 4** [From label propagation to graph neural networks](/assets/pdf/[GIST]04_From_label_propagation_to_graph_neural_networks.pdf)
+
 ### Seminar @ Ehwa Womans University
 
 This is a seminar that I gave at Ehwa Womans University as a guest speaker in April 2025.
