@@ -48,5 +48,5 @@ I am always open to new ideas and collaborations, so feel free to reach out to m
 
 Here is my formal <a href="https://drive.google.com/file/d/1UhefwaijAm7FC312RY2UYLxnRH0jNrqY/view?usp=sharing">CV</a> :)
 
-And I also have a <a href="https://yongminshin.simple.ink/">personal blog</a>. Check it out!
+And I also have a <a href="https://yongminshin.thesimple.ink/">personal blog</a>. Check it out!
 
