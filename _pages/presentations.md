@@ -19,7 +19,9 @@ This is a series of seminars that I gave at Gwangju Institute of Science and Tec
 
 **Session 3:** [A graph signal processing viewpoint of graph neural networks](/assets/pdf/[GIST]03_A_graph_signal_processing_viewpoint_of_graph_neural_networks.pdf)
 
-**Session 4** [From label propagation to graph neural networks](/assets/pdf/[GIST]04_From_label_propagation_to_graph_neural_networks.pdf)
+**Session 4:** [From label propagation to graph neural networks](/assets/pdf/[GIST]04_From_label_propagation_to_graph_neural_networks.pdf)
+
+**Session 5:** [On the problem of oversmoothing and oversquashing](/assets/pdf/[GIST]05_On_the_problem_of_oversmoothing_and_oversquashing.pdf)
 
 ### Seminar @ Ehwa Womans University
 
