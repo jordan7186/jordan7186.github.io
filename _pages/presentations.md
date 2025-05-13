@@ -11,7 +11,7 @@ nav_order: 3
 
 ### Seminar series @ GIST
 
-This is a series of seminars that I gave at Gwangju Institute of Science and Technology (GIST) as a guest speaker from March ~ June 2025. The seminar series was about the basics of graph neural networks, several fundamental concepts, and applications of GNNs.
+This is a series of seminars that I gave at Gwangju Institute of Science and Technology (GIST) as a guest speaker in Prof. Honk Kook Kim's group from March ~ May 2025. The seminar series covers the basics of graph neural networks, several fundamental concepts, and applications.
 
 **Session 1:** [Introduction to graph mining and graph neural networks](/assets/pdf/[GIST]01_Introduction_to_graph_mining_and_graph_neural_networks.pdf)
 
@@ -22,6 +22,10 @@ This is a series of seminars that I gave at Gwangju Institute of Science and Tec
 **Session 4:** [From label propagation to graph neural networks](/assets/pdf/[GIST]04_From_label_propagation_to_graph_neural_networks.pdf)
 
 **Session 5:** [On the problem of oversmoothing and oversquashing](/assets/pdf/[GIST]05_On_the_problem_of_oversmoothing_and_oversquashing.pdf)
+
+**Session 6:** Towards efficient graph learning (TBA)
+
+**Session 7:** Explainable graph neural networks (TBA)
 
 ### Seminar @ Ehwa Womans University
 
