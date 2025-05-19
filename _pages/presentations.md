@@ -23,7 +23,7 @@ This is a series of seminars that I gave at Gwangju Institute of Science and Tec
 
 **Session 5:** [On the problem of oversmoothing and oversquashing](/assets/pdf/[GIST]05_On_the_problem_of_oversmoothing_and_oversquashing.pdf)
 
-**Session 6:** Towards efficient graph learning (TBA)
+**Session 6:** [Towards efficient graph learning](/assets/pdf/[GIST]06_Towards_efficient_graph_learning.pdf)
 
 **Session 7:** Explainable graph neural networks (TBA)
 
