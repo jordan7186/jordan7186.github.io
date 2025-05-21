@@ -39,6 +39,16 @@ This is the poster for my paper "Faithful and Accurate Self-Attention Attributio
 
 **Poster:** [Faithful and Accurate Self-Attention Attribution for Message Passing Neural Networks via the Computation Tree Viewpoint](/assets/pdf/Poster_final_GAtt.pdf)
 
+### On the Feasibility of Fidelity- for Graph Pruning
+
+This is the poster and presentation slides for my paper "On the Feasibility of Fidelity- for Graph Pruning" presented at the Workshop on Explainable Artificial Intelligence (XAI) at the 2024 International Joint Conference on Artificial Intelligence (IJCAI). The arxiv version of the paper can be found [here](https://arxiv.org/abs/2406.11504).
+
+**Poster:** [On the Feasibility of Fidelity- for Graph Pruning](/assets/pdf/Poster_final_IJCAIW2024.pdf)
+
+**Slide:** [On the Feasibility of Fidelity- for Graph Pruning](/assets/pdf/240805_IJCAIW_Presentation_Yong-Min_Shin.pdf)
+
+And also here is the accompanying blog post: [On the Feasibility of Fidelity- for Graph Pruning](https://jordan7186.github.io/blog/2024/Fidelity_pruning/).
+
 ### PAGE: Prototype-Based Model-Level Explanations for Graph Neural Networks
 
 This presentation slides were submitted as an official supplementary material after being accepted as the best academic paper at the Graduate School of Yonsei University.
