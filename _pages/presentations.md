@@ -7,11 +7,11 @@ nav: true
 nav_order: 3
 ---
 
-## External presentations
+## External presentations (Selected)
 
 ### Seminar series @ GIST
 
-This is a series of seminars that I gave at Gwangju Institute of Science and Technology (GIST) as a guest speaker in Prof. Honk Kook Kim's group from March ~ May 2025. The seminar series covers the basics of graph neural networks, several fundamental concepts, and applications.
+This is a series of seminars that I gave at Gwangju Institute of Science and Technology (GIST) as a guest speaker in Prof. Hong Kook Kim's group from March ~ May 2025. The seminar series covers the basics of graph neural networks, several fundamental concepts, and applications.
 
 **Session 1:** [Introduction to graph mining and graph neural networks](/assets/pdf/[GIST]01_Introduction_to_graph_mining_and_graph_neural_networks.pdf)
 
@@ -33,13 +33,13 @@ This is a seminar that I gave at Ehwa Womans University as a guest speaker in Ap
 
 **Slides**: [A practical introduction to (explainable) graph learning](/assets/pdf/Ewha_Uni_lecture.pdf)
 
-### Faithful and Accurate Self-Attention Attribution for Message Passing Neural Networks via the Computation Tree Viewpoint
+### AAAI'25, Faithful and Accurate Self-Attention Attribution for Message Passing Neural Networks via the Computation Tree Viewpoint
 
 This is the poster for my paper "Faithful and Accurate Self-Attention Attribution for Message Passing Neural Networks via the Computation Tree Viewpoint" that was accepted at AAAI 2025. The arxiv version of the paper can be found [here](https://arxiv.org/abs/2406.04612).
 
 **Poster:** [Faithful and Accurate Self-Attention Attribution for Message Passing Neural Networks via the Computation Tree Viewpoint](/assets/pdf/Poster_final_GAtt.pdf)
 
-### On the Feasibility of Fidelity- for Graph Pruning
+### IJCAI'24 workshop on XAI: On the Feasibility of Fidelity- for Graph Pruning
 
 This is the poster and presentation slides for my paper "On the Feasibility of Fidelity- for Graph Pruning" presented at the Workshop on Explainable Artificial Intelligence (XAI) at the 2024 International Joint Conference on Artificial Intelligence (IJCAI). The arxiv version of the paper can be found [here](https://arxiv.org/abs/2406.11504).
 
@@ -61,14 +61,15 @@ Also, this is the poster that I presented for the short version, accepted at AAA
 
 ### Edgeless-GNN: Unsupervised Inductive Edgeless Network Embedding
 
-This presentation was given during the 28th Samsung HumanTech award, which eventually led to the award of the bronze prize.
+This presentation was given during the competition for the 28th Samsung HumanTech Award (Bronze prize).
 
 **Slide:** [Edgeless-GNN: Unsupervised Inductive Edgeless Network Embedding](/assets/pdf/EdgelessGNN_Hutech.pdf)
 
+---
 
-## Internal presentations
+## Selected Internal Presentations
 
-### Causal learning
+### Topic: Causal learning
 
 This was a two-part presentation where I introduced the basics of causal learning in an internal seminar at my lab, which I got a LOT of help from ["Introduction to Causal Inference" by Brady Neal](https://www.bradyneal.com/causal-inference-course). Thank you!!
 
@@ -76,25 +77,25 @@ This was a two-part presentation where I introduced the basics of causal learnin
 
 **Slide 2:** [Causal learning: Part 2](/assets/pdf/Causal_learning_part2.pdf)
 
-### Self-supervised learning
+### Topic: Self-supervised learning
 
 This was a presentation made when I was interested in understanding the SimCLR framework.
 
 **Slide:** [Introduction to SimCLR](/assets/pdf/SimCLR.pdf)
 
-### Knowledge distillation
+### Topic: Knowledge distillation
 
 Towards understanding knowledge distillation: This was a presentation made when I was interested in understanding knowledge distillation, which I eventually applied to my research on efficient graph learning.
 
 **Slide:** [Towards understanding knowledge distillation](/assets/pdf/Knowledge_distillation.pdf)
 
-### Physics-informed machine learning (PIML)
+### Topic: Physics-informed machine learning (PIML)
 
 A review of the paper: Vector Neurons: A General Framework for SO(3)-Equivariant Networks by Dent et al. This was a presentation made when I was interested in understanding the physics-informed machine learning landscape.
 
 **Slide:** [Vector Neurons: A General Framework for SO(3)-Equivariant Networks](/assets/pdf/Vector_Neurons.pdf)
 
-### Unsupervised disentanglement
+### Topic: Unsupervised disentanglement
 
 A review of the paper: Challenging common assumptions in the unsupervised learning of disentangled representations by Locatello et al.
 
