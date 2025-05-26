@@ -25,7 +25,7 @@ This is a series of seminars that I gave at Gwangju Institute of Science and Tec
 
 **Session 6:** [Towards efficient graph learning](/assets/pdf/[GIST]06_Towards_efficient_graph_learning.pdf)
 
-**Session 7:** Explainable graph neural networks (TBA)
+**Session 7:** [Explainable graph neural networks](/assets/pdf/[GIST]07_Explainable_graph_neural_networks.pdf)
 
 ### Seminar @ Ehwa Womans University
 
