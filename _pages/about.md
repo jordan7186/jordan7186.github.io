@@ -40,7 +40,7 @@ I am always interested in reading about for other research fields, for example i
 
 I am always open to new ideas and collaborations, so feel free to reach out to me!
 
-Here is my formal <a href="https://drive.google.com/file/d/1UhefwaijAm7FC312RY2UYLxnRH0jNrqY/view?usp=sharing">CV</a> :)
+Here is my formal [CV](/assets/pdf/CV.pdf) :)
 
 And I also have a <a href="https://yongminshin.thesimple.ink/">personal blog</a>. Check it out!
 
