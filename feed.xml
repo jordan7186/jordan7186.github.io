@@ -1,4 +1,231 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="https://jordan7186.github.io/feed.xml" rel="self" type="application/atom+xml"/><link href="https://jordan7186.github.io/" rel="alternate" type="text/html" hreflang="en"/><updated>2025-07-28T15:31:12+00:00</updated><id>https://jordan7186.github.io/feed.xml</id><title type="html">Yong-Min Shin</title><subtitle>Welcome to my homepage! </subtitle><entry><title type="html">On the feasibility of fidelity- for graph pruning</title><link href="https://jordan7186.github.io/blog/2024/Fidelity_pruning/" rel="alternate" type="text/html" title="On the feasibility of fidelity- for graph pruning"/><published>2024-08-03T00:00:00+00:00</published><updated>2024-08-03T00:00:00+00:00</updated><id>https://jordan7186.github.io/blog/2024/Fidelity_pruning</id><content type="html" xml:base="https://jordan7186.github.io/blog/2024/Fidelity_pruning/"><![CDATA[<p><a href="https://arxiv.org/abs/2406.11504v1">Full paper</a>, <a href="https://sites.google.com/view/xai2024/home">Workshop site</a>, <a href="https://drive.google.com/file/d/1wLAkPpL-2UHZcwUcn7dFT6UOjkvYhSTb/view?usp=sharing">Presentation slides</a>, <a href="https://drive.google.com/file/d/1QlNp618vzLtTdMqMuS8IEVQAvUL3msQ5/view?usp=sharing">Poster</a></p> <p>This is an blog post on the paper “On the Feasibility of Fidelity- for Graph Pruning”, presented in the IJCAI 2024 Workshop on Explainable Artificial Intelligence (XAI). I hope this post provides a more informal yet interesting discussion around the paper.</p> <h3 id="main-post">Main post</h3> <p>Why do we need to explain AI models? Personally, the model debugging &amp; social aspect [1] was the most compelling argument during the early days I started to get involved in XAI. Progressing through the field, I eventually learned that a lot of methods have been developed to address this objective of XAI, and quite effectively (although may not be perfect).</p> <p>Recently, my focus shifted towards a more <em>eventual</em> goal of XAI: Wouldn’t it be great if we go full circle and use the information gained from the explanations back to the model for improvement? The idea of using the explanation as a means to improvement is also referenced in [4] in the context of using AI for science:</p> <p><em>“In the sciences, identifying these patterns, i.e., explaining and interpreting what features the AI system uses for predicting, is often more important than the prediction itself, because it unveils information about the biological, chemical or neural mechanisms and may lead to new scientific insights.”</em></p> <p>Although the quote is in the context for pursuing new scientific discoveries, there are already some studies that also push explanations towards model improvement, specifically. One example of this would be [5], where it includes the explanation as a term in the loss function in order to further regularize the model. Another one would be [6], where it uses the explanation to directly control how information flows inside the graph neural network model (GNN).</p> <p>This work also shares the same objective.</p> <p>Specifically, we are working on the domain of graph learning, and naturally we are interested in the improvement of <em>GNN models</em>. Briefly speaking, GNNs are a type of neural network architecture made to perform on graph data. For each node, the local graph structure is aggregated and processed by the GNN, which typically generates a latent representation fit for some specific task (e.g., node classification).</p> <p>The <strong>explanation</strong> for this (’target’) node is typically returned as a subset of surrounding nodes or edges that highly contributes to the model’s decisions. You can easily imagine that out of the nearby local edge (or nodes), not all edges are critically used to, let’s say, predict the target node’s class. Specifically, the explanation method takes in the target node, given graph, and the GNN model to be explained and assigns an ‘important score’ to the nearby edges (or nodes). Naturally, if the explanation method is ‘good’, the importance score will accurately reflect the GNN’s point of view when computing the output. This is an important logic that will be used throughout the project.</p> <p>This logic is also reflected in ‘fidelity\(^{-}\)’, a quantitative measurement to assess the explanation method’s performance. To see whether the explanation method is truly faithful to the GNN model, one can imagine the following experiment: take the target node and its local graph structure, run the explanation to get important scores, delete edges that are deemed ‘unimportant’, and see how much the model’s response have changed without deletion. If the deleted edges were truly unimportant to the target node, we should see small or no changes in the model behavior.</p> <p>As I mentioned, fidelity\(^{-}\) is mainly used for assessing explanation methods [7]. But let’s look at it this way: According to the fidelity\(^{-}\) measure, we can view the explanation methods as some sort of filter that can pick out unimportant edges. Pushing this idea, <strong>how about we just use explanations to find globally (i.e., for all nodes in the graph) unimportant edges</strong>? In other words, <strong>can we use explanations for graph pruning</strong>?</p> <p>Pruning a graph has been a separate research topic. Typically, one might consider graph pruning in order to achieve better efficiency of GNN models, since GNNs are known to have time &amp; memory complexity being proportional to the number of edges in the input graph [8]. The removal of unnecessary edges will not only result in better efficiency, but perhaps also act as a data denoising process in itself [9]. However, to the best of our knowledge, we are the first to propose using explanation for graph pruning.</p> <p>To see whether explanations are a good fit for graph pruning, we first need a method on how to do this. For this, we propose FiP (Fidelity-inspired Pruning), which takes explanations for all nodes in the graph and produces a pruned graph with different sparsity levels. The main task that FiP is required to perform is to aggregate a bunch of local edge importance scores to global edge importance score (i.e., going from importance scores for a specific node to a general importance score independent from any specific node). This is fairly straightforward: Imagine we now focus our attention to one specific edge while running explanations for all nodes in the graph. During this process, a number of importance scores will be assigned to that edge when the target node is nearby. After running the explanation is complete, we simply ‘sum’ or ‘average out’ these importance scores to get a single global importance score value. After this process has been done for all edges, we can choose to keep edges with the top \(k\)% global importance scores.</p> <p>Well, now we know how to convert explanations into pruning graphs, the next question would be how much does explanation methods actually perform in graph pruning? We follow the typical setting where we measure the test performance of the GNN using the pruned graph for different levels of sparsity (5% removed all the way up to 95%, 100% removed). For what explanation method to use, we consider the following methods, which includes GNN-tailored and general explanation methods:</p> <ul> <li>Attention</li> <li>Saliency Attribution (i.e., gradient norm)</li> <li>Integrated Gradient</li> <li>Guided Backpropagation</li> <li>GNNExplainer</li> <li>PGExplainer</li> <li>FastDnX</li> </ul> <p>And for graph pruning, we also throw in a random baseline (random removal). We show for four datasets (BAShapes, Cora, Citeseer and Pubmed), and consider both sum and averaging during FiP:</p> <div class="row mt-3"> <div class="col-sm mt-3 mt-md-0"> <figure> <picture> <source class="responsive-img-srcset" media="(max-width: 480px)" srcset="/assets/img/blog6_1-480.webp"/> <source class="responsive-img-srcset" media="(max-width: 800px)" srcset="/assets/img/blog6_1-800.webp"/> <source class="responsive-img-srcset" media="(max-width: 1400px)" srcset="/assets/img/blog6_1-1400.webp"/> <img src="/assets/img/blog6_1.png" class="img-fluid rounded z-depth-1" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();"/> </picture> </figure> </div> </div> <div class="caption"> Graph pruning results using various explanation methods. </div> <p>There are some interesting points worth mentioning:</p> <ul> <li>Not all explanation methods are great for graph pruning. <ul> <li>Surprisingly, GNN-tailored explanations are generally worse for graph pruning (ex. GNNExplainer).</li> <li>The worse performing methods can even go even below random deletion.</li> </ul> </li> <li>There are some datasets that pruning is bad overall (ex. looking at the test performance for Pubmed, almost all methods barely perform better than random).</li> </ul> <p>Taken quite aback, we had to check the actual fideltiy\(^{-}\) scores for each method. After all, the idea of using explanations for graph pruning came from fideltiy\(^{-}\):</p> <div class="row mt-3"> <div class="col-sm mt-3 mt-md-0"> <figure> <picture> <source class="responsive-img-srcset" media="(max-width: 480px)" srcset="/assets/img/blog6_2-480.webp"/> <source class="responsive-img-srcset" media="(max-width: 800px)" srcset="/assets/img/blog6_2-800.webp"/> <source class="responsive-img-srcset" media="(max-width: 1400px)" srcset="/assets/img/blog6_2-1400.webp"/> <img src="/assets/img/blog6_2.png" class="img-fluid rounded z-depth-1" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();"/> </picture> </figure> </div> </div> <div class="caption"> Fidelity- scores for various explanation methods. </div> <p>In summary, the table suggests that fideltiy\(^{-}\) scores does not necessarily translate to good graph pruning performances: Especially looking at GNNExplainer, it shows the best fideltiy\(^{-}\) scores for two datasets, despite being one of the poorest in the graph pruning experiment.</p> <p>Why does this happen? Well, we think that despite the logic from fideltiy\(^{-}\) into graph pruning itself is okay, the technical details during FiP matters. One of the key characteristics of many ‘general’ explanation method (i.e., attention, saliency, integrated gradient, and guided backpropagation) is that the importance scores are relatively well behaved. In other words, the edge importance scores for these methods typically fall in a range (perhaps [0, 1]) and does not vary much from node to node. However, this may not be the case for GNN-tailored method, which often relies on optimization (GNNExplainer) and allows for importance scores to have high variance.</p> <p>This suggests that the scale normalization between nodes is a significant matter. However, how to adjust the scale across nodes make the problem quite tricky. For one, let’s say we want to normalize the sum of edge importance scores for each node to 1. This seems okay, but perhaps some nodes have very new local edges or others may have a lot of nearby edges, depending on the given graph structure. Between these two cases, making the sum to 1 for both cases is unfair. We will have to come up with a better solution for this, which I will be working on in the near future.</p> <h3 id="references--notes">References &amp; Notes</h3> <p>[1] Explaining the reason behind a deep neural network classifier might reveal whether the model is performing classification with the right reasons (see also: Clever Hans [2, 3]). Also, providing the reason behind the AI model’s behavior helps establishing a trust relationship between the machine and user [4].</p> <p>[2] <a href="https://en.wikipedia.org/wiki/Clever_Hans">https://en.wikipedia.org/wiki/Clever_Hans</a></p> <p>[3] Lapuschkin <em>et al.</em> Unmasking Clever Hans predictors and assessing what machines really learn. <em>Nat Commun</em> 10, 1096 (2019).</p> <p>[4] Samek &amp; Müller, Towards Explainable Artificial Intelligence. Explainable AI 2019: 5-22</p> <p>[5] Rieger et al., Interpretations are Useful: Penalizing Explanations to Align Neural Networks with Prior Knowledge, ICML 2020</p> <p>[6] Giunchiglia et al., Towards Training GNNs using Explanation Directed Message Passing, LoG 2022</p> <p>[7] Yuan et al., Explainability in Graph Neural Networks: A Taxonomic Survey, TPAMI (2023)</p> <p>[8] Chiang et al., Cluster-GCN: An Efficient Algorithm for Training Deep and Large Graph Convolutional Networks, KDD 2019</p> <p>[9] Chen et al., A Unified Lottery Tickets Hypothesis for Graph Neural Networks, ICML 2021</p>]]></content><author><name></name></author><category term="Graph_pruning"/><category term="Graph_learning,"/><category term="XAI"/><summary type="html"><![CDATA[Full paper, Workshop site, Presentation slides, Poster]]></summary></entry><entry><title type="html">Experiments on using Kolmogorov-Arnold Networks (KAN) on Graph Learning (Github link)</title><link href="https://jordan7186.github.io/blog/2024/GraphKAN_experiment/" rel="alternate" type="text/html" title="Experiments on using Kolmogorov-Arnold Networks (KAN) on Graph Learning (Github link)"/><published>2024-03-29T00:00:00+00:00</published><updated>2024-03-29T00:00:00+00:00</updated><id>https://jordan7186.github.io/blog/2024/GraphKAN_experiment</id><content type="html" xml:base="https://jordan7186.github.io/blog/2024/GraphKAN_experiment/"><![CDATA[<p>A simple experiment on using Kolmogorov-Arnold Networks (KAN) on Graph Learning. The full experiment (with code) is available on my <a href="https://github.com/jordan7186/kangnn-experiment">GitHub page</a>.</p>]]></content><author><name></name></author><category term="KAN"/><category term="Graph_learning,"/><category term="KAN"/><summary type="html"><![CDATA[A simple experiment on using Kolmogorov-Arnold Networks (KAN) on Graph Learning. The full experiment (with code) is available on my GitHub page.]]></summary></entry><entry><title type="html">Comparing the Efficiency of ChebConv, GCN, and SGC</title><link href="https://jordan7186.github.io/blog/2022/Efficiency_Comparison/" rel="alternate" type="text/html" title="Comparing the Efficiency of ChebConv, GCN, and SGC"/><published>2022-11-11T00:00:00+00:00</published><updated>2022-11-11T00:00:00+00:00</updated><id>https://jordan7186.github.io/blog/2022/Efficiency_Comparison</id><content type="html" xml:base="https://jordan7186.github.io/blog/2022/Efficiency_Comparison/"><![CDATA[<h1 id="introduction">Introduction</h1> <p>In the current deep learning era that we live in, we now have various models that are widely used not only in research but also real-world problem solving in other data types such as image and natural languages: ResNet, YOLO, BERT, GPT, to name a few. The equivalent model in the field of graph data is perhaps the GCN model (Graph Convolutional Networks) (Kipf &amp; Welling, 2017).</p> <p>GCN continues the effort made in ChebConv (Defferrard et al., 2016) in trying to build an efficient yet effective graph learning model, based on the framework of graph signal processing. Although not as commonly used but still well-known, SGC (Simple Graph Convolution) (Wu et al., 2019) proposes an even simpler model on top of GCN, resulting in the most straightforward model to interpret out of the three models. In this post, we will attempt to comprehensively compare the three models in terms of efficiency.</p> <h1 id="architecture-of-three-models">Architecture of three models</h1> <h2 id="chebconv">ChebConv</h2> <p>As mentioned, GCN starts from the ChebConv model. First, let us define several concepts and notations:</p> <ul> <li>A graph \(G\) with the set of nodes \(V\) and edges \(E \subseteq V \times V\) is described as \(G = (V, E)\).</li> <li>Let us assume the graph is unweighted and undirected.</li> <li>The graph structure can be represented as a symmetric square matrix \(A \in \{0,1\}^{V \times V}\), where \(A_{ij} = 1\) iff \((i,j) \in E\).</li> <li>The degree matrix \(D\) is a diagonal matrix, where \(D_{ii}\) is the degree of node \(i\), and zero elsewhere.</li> <li>The (normalized) Laplacian matrix of \(G\) is denoted as \(L = I - D^{-1/2} A D^{-1/2}\). In GCN, we use a normalized version of the Laplacian: \(\tilde{L} = \dfrac{2}{\lambda_{\max}}L - I\), where the eigenvalues of \(\tilde{L}\) are normalized to the range of \([-1, 1]\).</li> </ul> <p>Then, the ChebConv layer can be described as:</p> \[\text{ChebConv} = \sum_{k=0}^{K-1}\theta_k T_k(\tilde{L})\] <p>, where \(T_k\) is the \(k\)-th basis function of the Chebyshev expansion and \(\theta_k\)’s are learnable parameters.</p> <h2 id="formulation-of-gcn">Formulation of GCN</h2> <p>Building upon Chebconv, GCN simplifies the convolution by only using the first two terms:</p> \[\theta_0 T_0(\tilde{L}) + \theta_1 T_1(\tilde{L}) = \theta_0 I + \theta_1 \tilde{L}\] <p>, and instead compensate by stacking multiple layers. Further approximating \(\lambda_{\max} = 2\), we can modify to:</p> \[\theta_0 I + \theta_1 \tilde{L} = \theta_0 I + \theta_1 (L - I) = \theta_0 I - \theta_1 D^{-1/2}AD^{-1/2}.\] <p>Furthermore, we can set $\theta_0 = -\theta_1 = \theta$ to reduce the number of parameters:</p> \[\theta(I + D^{-1/2}AD^{-1/2})\] <p>Finally, using the renormalization trick to keep the range of eigenvalues within \([0,1]\), we are left the following convolution layer:</p> \[\tilde{D}^{-1/2}\tilde{A}\tilde{D}^{-1/2}\theta\] <table> <tbody> <tr> <td>, where \(\tilde{A} = A + I\), and \(\tilde{D}\) follows a similar definition from \(D\). For a general \(C\)-dimensional graph signal $$X \in \mathbb{R}^{</td> <td>V</td> <td>\times C}$$, we get the final convolution for GCN:</td> </tr> </tbody> </table> \[\text{GCNConv} = \tilde{D}^{-1/2}\tilde{A}\tilde{D}^{-1/2}X\Theta\] <p>, where \(\Theta \in \mathbb{R}^{C \times d}\) is a learnable matrix which maps the \(C\)-dimensional convoluted signal to a \(d\)-dimensional representation. Denoting \(\sigma\) as some non-linear activation function (e.g., ReLU) and \(\bar{A} = \tilde{D}^{-1/2}A\tilde{D}^{-1/2}\) for simplicity, stacking \(L\) layers of the convolution results in the following model architecture (assuming we are solving node classification):</p> \[\text{GCN}(A, X) = \text{softmax}(\bar{A}\sigma(\bar{A}\sigma(\cdots\sigma(\bar{A}\sigma(\bar{A}X\Theta_{1})\Theta_2)\cdots)\Theta_{L-1})\Theta_{L}).\] <p>Here, the set of parameter matrices \(\mathbf{\Theta} = \{\Theta_1, \cdots ,\Theta_L\}\) are learned using gradient descent.</p> <h2 id="formulation-of-sgc">Formulation of SGC</h2> <p>As the name suggests, SGC aims to simplify GCNs even further. Starting from the original equation of GCN above, they remove most of the non-linearity in the GCN model:</p> \[\text{softmax}(\bar{A}\bar{A}\cdots\bar{A}\bar{A}X\Theta_{1}\Theta_2\cdots\Theta_{L-1}\Theta_{L}) = \text{softmax}(\bar{A}^L X\Theta_{1}\Theta_2\cdots\Theta_{L-1}\Theta_{L}).\] <p>Removing the non-linearities further enables to reduce all parameter matrices to just one, as we can just model compositions of multiple linear transformations as a single linear transformation:</p> \[\text{softmax}(\bar{A}^L X\Theta_{1}\Theta_2\cdots\Theta_{L-1}\Theta_{L}) = \text{softmax}(\bar{A}^L X\Theta).\] <h1 id="analysis-of-efficiency">Analysis of efficiency</h1> <p>Here, we aim to analyze the efficiency of the three models. Specifically, the model configuration is made as follows to ensure the receptive field remains the same:</p> <ul> <li><strong>ChebConv</strong>: 1 layer model with \(K=2,3,4,5\).</li> </ul> \[f^{\text{Cheb}}_{K}(A, X) = \text{softmax}(\sum_{i=0}^{K-1}\theta_iT_{i}(L)X)\] <ul> <li><strong>GCN</strong>: $L$ layer model with \(L=1,2,3,4\). The equation below shows the case when \(L=2\).</li> </ul> \[f^{\text{GCN}}_{L=2}(A, X) = \text{softmax}(\bar{A}\sigma(\bar{A}X\Theta_{1})\Theta_2).\] <ul> <li><strong>SGC</strong>: 1 layer model with \(L=1,2,3,4\). The equation below shows the case when \(L=2\).</li> </ul> \[f^{\text{SGC}}_{L=2}(A, X) = \text{softmax}(\bar{A}^2 X \Theta)\] <p>For the implementation, we will use <strong>pytorch</strong> with <strong>pytorch geometric</strong> as the main library, and the code for the model architecture is as follows:</p> <ul> <li> <p>ChebConv</p> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="kn">import</span> <span class="n">torch</span>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="https://jordan7186.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://jordan7186.github.io/" rel="alternate" type="text/html" hreflang="en" /><updated>2025-08-31T06:25:08+00:00</updated><id>https://jordan7186.github.io/feed.xml</id><title type="html">Yong-Min Shin</title><subtitle>Welcome to my homepage!
+</subtitle><entry><title type="html">On the feasibility of fidelity- for graph pruning</title><link href="https://jordan7186.github.io/blog/2024/Fidelity_pruning/" rel="alternate" type="text/html" title="On the feasibility of fidelity- for graph pruning" /><published>2024-08-03T00:00:00+00:00</published><updated>2024-08-03T00:00:00+00:00</updated><id>https://jordan7186.github.io/blog/2024/Fidelity_pruning</id><content type="html" xml:base="https://jordan7186.github.io/blog/2024/Fidelity_pruning/"><![CDATA[<p><a href="https://arxiv.org/abs/2406.11504v1">Full paper</a>, <a href="https://sites.google.com/view/xai2024/home">Workshop site</a>, <a href="https://drive.google.com/file/d/1wLAkPpL-2UHZcwUcn7dFT6UOjkvYhSTb/view?usp=sharing">Presentation slides</a>, <a href="https://drive.google.com/file/d/1QlNp618vzLtTdMqMuS8IEVQAvUL3msQ5/view?usp=sharing">Poster</a></p>
+
+<p>This is an blog post on the paper “On the Feasibility of Fidelity- for Graph Pruning”, presented in the IJCAI 2024 Workshop on Explainable Artificial Intelligence (XAI). I hope this post provides a more informal yet interesting discussion around the paper.</p>
+
+<h3 id="main-post">Main post</h3>
+
+<p>Why do we need to explain AI models? Personally, the model debugging &amp; social aspect [1] was the most compelling argument during the early days I started to get involved in XAI. Progressing through the field, I eventually learned that a lot of methods have been developed to address this objective of XAI, and quite effectively (although may not be perfect).</p>
+
+<p>Recently, my focus shifted towards a more <em>eventual</em> goal of XAI: Wouldn’t it be great if we go full circle and use the information gained from the explanations back to the model for improvement? The idea of using the explanation as a means to improvement is also referenced in [4] in the context of using AI for science:</p>
+
+<p><em>“In the sciences, identifying these patterns, i.e., explaining and interpreting what features the AI system uses for predicting, is often more important than the prediction itself, because it unveils information about the biological, chemical or neural mechanisms and may lead to new scientific insights.”</em></p>
+
+<p>Although the quote is in the context for pursuing new scientific discoveries, there are already some studies that also push explanations towards model improvement, specifically. One example of this would be [5], where it includes the explanation as a term in the loss function in order to further regularize the model. Another one would be [6], where it uses the explanation to directly control how information flows inside the graph neural network model (GNN).</p>
+
+<p>This work also shares the same objective.</p>
+
+<p>Specifically, we are working on the domain of graph learning, and naturally we are interested in the improvement of <em>GNN models</em>. Briefly speaking, GNNs are a type of neural network architecture made to perform on graph data. For each node, the local graph structure is aggregated and processed by the GNN, which typically generates a latent representation fit for some specific task (e.g., node classification).</p>
+
+<p>The <strong>explanation</strong> for this (’target’) node is typically returned as a subset of surrounding nodes or edges that highly contributes to the model’s decisions. You can easily imagine that out of the nearby local edge (or nodes), not all edges are critically used to, let’s say, predict the target node’s class. Specifically, the explanation method takes in the target node, given graph, and the GNN model to be explained and assigns an ‘important score’ to the nearby edges (or nodes). Naturally, if the explanation method is ‘good’, the importance score will accurately reflect the GNN’s point of view when computing the output. This is an important logic that will be used throughout the project.</p>
+
+<p>This logic is also reflected in ‘fidelity\(^{-}\)’, a quantitative measurement to assess the explanation method’s performance. To see whether the explanation method is truly faithful to the GNN model, one can imagine the following experiment: take the target node and its local graph structure, run the explanation to get important scores, delete edges that are deemed ‘unimportant’, and see how much the model’s response have changed without deletion. If the deleted edges were truly unimportant to the target node, we should see small or no changes in the model behavior.</p>
+
+<p>As I mentioned, fidelity\(^{-}\) is mainly used for assessing explanation methods [7]. But let’s look at it this way: According to the fidelity\(^{-}\) measure, we can view the explanation methods as some sort of filter that can pick out unimportant edges. Pushing this idea, <strong>how about we just use explanations to find globally (i.e., for all nodes in the graph) unimportant edges</strong>? In other words, <strong>can we use explanations for graph pruning</strong>?</p>
+
+<p>Pruning a graph has been a separate research topic. Typically, one might consider graph pruning in order to achieve better efficiency of GNN models, since GNNs are known to have time &amp; memory complexity being proportional to the number of edges in the input graph [8]. The removal of unnecessary edges will not only result in better efficiency, but perhaps also act as a data denoising process in itself [9]. However, to the best of our knowledge, we are the first to propose using explanation for graph pruning.</p>
+
+<p>To see whether explanations are a good fit for graph pruning, we first need a method on how to do this. For this, we propose FiP (Fidelity-inspired Pruning), which takes explanations for all nodes in the graph and produces a pruned graph with different sparsity levels. The main task that FiP is required to perform is to aggregate a bunch of local edge importance scores to global edge importance score (i.e., going from importance scores for a specific node to a general importance score independent from any specific node). This is fairly straightforward: Imagine we now focus our attention to one specific edge while running explanations for all nodes in the graph. During this process, a number of importance scores will be assigned to that edge when the target node is nearby. After running the explanation is complete, we simply ‘sum’ or ‘average out’ these importance scores to get a single global importance score value. After this process has been done for all edges, we can choose to keep edges with the top \(k\)% global importance scores.</p>
+
+<p>Well, now we know how to convert explanations into pruning graphs, the next question would be how much does explanation methods actually perform in graph pruning? We follow the typical setting where we measure the test performance of the GNN using the pruned graph for different levels of sparsity (5% removed all the way up to 95%, 100% removed). For what explanation method to use, we consider the following methods, which includes GNN-tailored and general explanation methods:</p>
+
+<ul>
+  <li>Attention</li>
+  <li>Saliency Attribution (i.e., gradient norm)</li>
+  <li>Integrated Gradient</li>
+  <li>Guided Backpropagation</li>
+  <li>GNNExplainer</li>
+  <li>PGExplainer</li>
+  <li>FastDnX</li>
+</ul>
+
+<p>And for graph pruning, we also throw in a random baseline (random removal). We show for four datasets (BAShapes, Cora, Citeseer and Pubmed), and consider both sum and averaging during FiP:</p>
+
+<div class="row mt-3">
+    <div class="col-sm mt-3 mt-md-0">
+        <figure>
+
+  <picture>
+    
+    <source class="responsive-img-srcset" media="(max-width: 480px)" srcset="/assets/img/blog6_1-480.webp" />
+    <source class="responsive-img-srcset" media="(max-width: 800px)" srcset="/assets/img/blog6_1-800.webp" />
+    <source class="responsive-img-srcset" media="(max-width: 1400px)" srcset="/assets/img/blog6_1-1400.webp" />
+    
+
+    <!-- Fallback to the original file -->
+    <img src="/assets/img/blog6_1.png" class="img-fluid rounded z-depth-1" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();" />
+  </picture>
+
+</figure>
+
+    </div>
+</div>
+<div class="caption">
+  Graph pruning results using various explanation methods.
+</div>
+
+<p>There are some interesting points worth mentioning:</p>
+
+<ul>
+  <li>Not all explanation methods are great for graph pruning.
+    <ul>
+      <li>Surprisingly, GNN-tailored explanations are generally worse for graph pruning (ex. GNNExplainer).</li>
+      <li>The worse performing methods can even go even below random deletion.</li>
+    </ul>
+  </li>
+  <li>There are some datasets that pruning is bad overall (ex. looking at the test performance for Pubmed, almost all methods barely perform better than random).</li>
+</ul>
+
+<p>Taken quite aback, we had to check the actual fideltiy\(^{-}\) scores for each method. After all, the idea of using explanations for graph pruning came from fideltiy\(^{-}\):</p>
+
+<div class="row mt-3">
+    <div class="col-sm mt-3 mt-md-0">
+        <figure>
+
+  <picture>
+    
+    <source class="responsive-img-srcset" media="(max-width: 480px)" srcset="/assets/img/blog6_2-480.webp" />
+    <source class="responsive-img-srcset" media="(max-width: 800px)" srcset="/assets/img/blog6_2-800.webp" />
+    <source class="responsive-img-srcset" media="(max-width: 1400px)" srcset="/assets/img/blog6_2-1400.webp" />
+    
+
+    <!-- Fallback to the original file -->
+    <img src="/assets/img/blog6_2.png" class="img-fluid rounded z-depth-1" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();" />
+  </picture>
+
+</figure>
+
+    </div>
+</div>
+<div class="caption">
+  Fidelity- scores for various explanation methods.
+</div>
+
+<p>In summary, the table suggests that fideltiy\(^{-}\) scores does not necessarily translate to good graph pruning performances: Especially looking at GNNExplainer, it shows the best fideltiy\(^{-}\) scores for two datasets, despite being one of the poorest in the graph pruning experiment.</p>
+
+<p>Why does this happen? Well, we think that despite the logic from fideltiy\(^{-}\) into graph pruning itself is okay, the technical details during FiP matters. One of the key characteristics of many ‘general’ explanation method (i.e., attention, saliency, integrated gradient, and guided backpropagation) is that the importance scores are relatively well behaved. In other words, the edge importance scores for these methods typically fall in a range (perhaps [0, 1]) and does not vary much from node to node. However, this may not be the case for GNN-tailored method, which often relies on optimization (GNNExplainer) and allows for importance scores to have high variance.</p>
+
+<p>This suggests that the scale normalization between nodes is a significant matter. However, how to adjust the scale across nodes make the problem quite tricky. For one, let’s say we want to normalize the sum of edge importance scores for each node to 1. This seems okay, but perhaps some nodes have very new local edges or others may have a lot of nearby edges, depending on the given graph structure. Between these two cases, making the sum to 1 for both cases is unfair. We will have to come up with a better solution for this, which I will be working on in the near future.</p>
+
+<h3 id="references--notes">References &amp; Notes</h3>
+
+<p>[1] Explaining the reason behind a deep neural network classifier might reveal whether the model is performing classification with the right reasons (see also: Clever Hans [2, 3]). Also, providing the reason behind the AI model’s behavior helps establishing a trust relationship between the machine and user [4].</p>
+
+<p>[2] <a href="https://en.wikipedia.org/wiki/Clever_Hans">https://en.wikipedia.org/wiki/Clever_Hans</a></p>
+
+<p>[3] Lapuschkin <em>et al.</em> Unmasking Clever Hans predictors and assessing what machines really learn. <em>Nat Commun</em> 10, 1096 (2019).</p>
+
+<p>[4] Samek &amp; Müller, Towards Explainable Artificial Intelligence. Explainable AI 2019: 5-22</p>
+
+<p>[5] Rieger et al., Interpretations are Useful: Penalizing Explanations to Align Neural Networks with Prior Knowledge, ICML 2020</p>
+
+<p>[6] Giunchiglia et al., Towards Training GNNs using Explanation Directed Message Passing, LoG 2022</p>
+
+<p>[7] Yuan et al., Explainability in Graph Neural Networks: A Taxonomic Survey, TPAMI (2023)</p>
+
+<p>[8] Chiang et al., Cluster-GCN: An Efficient Algorithm for Training Deep and Large Graph Convolutional Networks, KDD 2019</p>
+
+<p>[9] Chen et al., A Unified Lottery Tickets Hypothesis for Graph Neural Networks, ICML 2021</p>]]></content><author><name></name></author><category term="Graph_pruning" /><category term="Graph_learning," /><category term="XAI" /><summary type="html"><![CDATA[Full paper, Workshop site, Presentation slides, Poster]]></summary></entry><entry><title type="html">Experiments on using Kolmogorov-Arnold Networks (KAN) on Graph Learning (Github link)</title><link href="https://jordan7186.github.io/blog/2024/GraphKAN_experiment/" rel="alternate" type="text/html" title="Experiments on using Kolmogorov-Arnold Networks (KAN) on Graph Learning (Github link)" /><published>2024-03-29T00:00:00+00:00</published><updated>2024-03-29T00:00:00+00:00</updated><id>https://jordan7186.github.io/blog/2024/GraphKAN_experiment</id><content type="html" xml:base="https://jordan7186.github.io/blog/2024/GraphKAN_experiment/"><![CDATA[<p>A simple experiment on using Kolmogorov-Arnold Networks (KAN) on Graph Learning. The full experiment (with code) is available on my <a href="https://github.com/jordan7186/kangnn-experiment">GitHub page</a>.</p>]]></content><author><name></name></author><category term="KAN" /><category term="Graph_learning," /><category term="KAN" /><summary type="html"><![CDATA[A simple experiment on using Kolmogorov-Arnold Networks (KAN) on Graph Learning. The full experiment (with code) is available on my GitHub page.]]></summary></entry><entry><title type="html">Comparing the Efficiency of ChebConv, GCN, and SGC</title><link href="https://jordan7186.github.io/blog/2022/Efficiency_Comparison/" rel="alternate" type="text/html" title="Comparing the Efficiency of ChebConv, GCN, and SGC" /><published>2022-11-11T00:00:00+00:00</published><updated>2022-11-11T00:00:00+00:00</updated><id>https://jordan7186.github.io/blog/2022/Efficiency_Comparison</id><content type="html" xml:base="https://jordan7186.github.io/blog/2022/Efficiency_Comparison/"><![CDATA[<h1 id="introduction">Introduction</h1>
+
+<p>In the current deep learning era that we live in, we now have various models that are widely used not only in research but also real-world problem solving in other data types such as image and natural languages: ResNet, YOLO, BERT, GPT, to name a few. The equivalent model in the field of graph data is perhaps the GCN model (Graph Convolutional Networks) (Kipf &amp; Welling, 2017).</p>
+
+<p>GCN continues the effort made in ChebConv (Defferrard et al., 2016) in trying to build an efficient yet effective graph learning model, based on the framework of graph signal processing. Although not as commonly used but still well-known, SGC (Simple Graph Convolution) (Wu et al., 2019) proposes an even simpler model on top of GCN, resulting in the most straightforward model to interpret out of the three models. In this post, we will attempt to comprehensively compare the three models in terms of efficiency.</p>
+
+<h1 id="architecture-of-three-models">Architecture of three models</h1>
+
+<h2 id="chebconv">ChebConv</h2>
+
+<p>As mentioned, GCN starts from the ChebConv model. First, let us define several concepts and notations:</p>
+
+<ul>
+  <li>A graph \(G\) with the set of nodes \(V\) and edges \(E \subseteq V \times V\) is described as \(G = (V, E)\).</li>
+  <li>Let us assume the graph is unweighted and undirected.</li>
+  <li>The graph structure can be represented as a symmetric square matrix \(A \in \{0,1\}^{V \times V}\), where \(A_{ij} = 1\) iff \((i,j) \in E\).</li>
+  <li>The degree matrix \(D\) is a diagonal matrix, where \(D_{ii}\) is the degree of node \(i\), and zero elsewhere.</li>
+  <li>The (normalized) Laplacian matrix of \(G\) is denoted as \(L = I - D^{-1/2} A D^{-1/2}\). In GCN, we use a normalized version of the Laplacian: \(\tilde{L} = \dfrac{2}{\lambda_{\max}}L - I\), where the eigenvalues of \(\tilde{L}\) are normalized to the range of \([-1, 1]\).</li>
+</ul>
+
+<p>Then, the ChebConv layer can be described as:</p>
+
+\[\text{ChebConv} = \sum_{k=0}^{K-1}\theta_k T_k(\tilde{L})\]
+
+<p>, where \(T_k\) is the \(k\)-th basis function of the Chebyshev expansion and \(\theta_k\)’s are learnable parameters.</p>
+
+<h2 id="formulation-of-gcn">Formulation of GCN</h2>
+
+<p>Building upon Chebconv, GCN simplifies the convolution by only using the first two terms:</p>
+
+\[\theta_0 T_0(\tilde{L}) + \theta_1 T_1(\tilde{L}) = \theta_0 I + \theta_1 \tilde{L}\]
+
+<p>, and instead compensate by stacking multiple layers. Further approximating \(\lambda_{\max} = 2\), we can  modify to:</p>
+
+\[\theta_0 I + \theta_1 \tilde{L} = \theta_0 I + \theta_1 (L - I) = \theta_0 I - \theta_1 D^{-1/2}AD^{-1/2}.\]
+
+<p>Furthermore, we can set $\theta_0 = -\theta_1 = \theta$ to reduce the number of parameters:</p>
+
+\[\theta(I + D^{-1/2}AD^{-1/2})\]
+
+<p>Finally, using the renormalization trick to keep the range of eigenvalues within \([0,1]\), we are left the following convolution layer:</p>
+
+\[\tilde{D}^{-1/2}\tilde{A}\tilde{D}^{-1/2}\theta\]
+
+<table>
+  <tbody>
+    <tr>
+      <td>, where \(\tilde{A} = A + I\), and \(\tilde{D}\) follows a similar definition from \(D\). For a general \(C\)-dimensional graph signal $$X \in \mathbb{R}^{</td>
+      <td>V</td>
+      <td>\times C}$$, we get the final convolution for GCN:</td>
+    </tr>
+  </tbody>
+</table>
+
+\[\text{GCNConv} = \tilde{D}^{-1/2}\tilde{A}\tilde{D}^{-1/2}X\Theta\]
+
+<p>, where \(\Theta \in \mathbb{R}^{C \times d}\) is a learnable matrix which maps the \(C\)-dimensional convoluted signal to a \(d\)-dimensional representation. Denoting \(\sigma\) as some non-linear activation function (e.g., ReLU) and \(\bar{A} = \tilde{D}^{-1/2}A\tilde{D}^{-1/2}\) for simplicity, stacking \(L\) layers of the convolution results in the following model architecture (assuming we are solving node classification):</p>
+
+\[\text{GCN}(A, X) = \text{softmax}(\bar{A}\sigma(\bar{A}\sigma(\cdots\sigma(\bar{A}\sigma(\bar{A}X\Theta_{1})\Theta_2)\cdots)\Theta_{L-1})\Theta_{L}).\]
+
+<p>Here, the set of parameter matrices \(\mathbf{\Theta} = \{\Theta_1, \cdots ,\Theta_L\}\) are learned using gradient descent.</p>
+
+<h2 id="formulation-of-sgc">Formulation of SGC</h2>
+
+<p>As the name suggests, SGC aims to simplify GCNs even further. Starting from the original equation of GCN above, they remove most of the non-linearity in the GCN model:</p>
+
+\[\text{softmax}(\bar{A}\bar{A}\cdots\bar{A}\bar{A}X\Theta_{1}\Theta_2\cdots\Theta_{L-1}\Theta_{L}) = \text{softmax}(\bar{A}^L X\Theta_{1}\Theta_2\cdots\Theta_{L-1}\Theta_{L}).\]
+
+<p>Removing the non-linearities further enables to reduce all parameter matrices to just one, as we can just model compositions of multiple linear transformations as a single linear transformation:</p>
+
+\[\text{softmax}(\bar{A}^L X\Theta_{1}\Theta_2\cdots\Theta_{L-1}\Theta_{L}) = \text{softmax}(\bar{A}^L X\Theta).\]
+
+<h1 id="analysis-of-efficiency">Analysis of efficiency</h1>
+
+<p>Here, we aim to analyze the efficiency of the three models. Specifically, the model configuration is made as follows to ensure the receptive field remains the same:</p>
+
+<ul>
+  <li><strong>ChebConv</strong>: 1 layer model with \(K=2,3,4,5\).</li>
+</ul>
+
+\[f^{\text{Cheb}}_{K}(A, X) = \text{softmax}(\sum_{i=0}^{K-1}\theta_iT_{i}(L)X)\]
+
+<ul>
+  <li><strong>GCN</strong>: $L$ layer model with \(L=1,2,3,4\). The equation below shows the case when \(L=2\).</li>
+</ul>
+
+\[f^{\text{GCN}}_{L=2}(A, X) = \text{softmax}(\bar{A}\sigma(\bar{A}X\Theta_{1})\Theta_2).\]
+
+<ul>
+  <li><strong>SGC</strong>: 1 layer model with \(L=1,2,3,4\). The equation below shows the case when \(L=2\).</li>
+</ul>
+
+\[f^{\text{SGC}}_{L=2}(A, X) = \text{softmax}(\bar{A}^2 X \Theta)\]
+
+<p>For the implementation, we will use <strong>pytorch</strong> with <strong>pytorch geometric</strong> as the main library, and the code for the model architecture is as follows:</p>
+
+<ul>
+  <li>
+    <p>ChebConv</p>
+
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="kn">import</span> <span class="n">torch</span>
   <span class="kn">from</span> <span class="n">torch_geometric.nn</span> <span class="kn">import</span> <span class="n">ChebConv</span>
     
   <span class="k">class</span> <span class="nc">GNN_Cheb</span><span class="p">(</span><span class="n">torch</span><span class="p">.</span><span class="n">nn</span><span class="p">.</span><span class="n">Module</span><span class="p">):</span>
@@ -11,7 +238,12 @@
           <span class="n">x</span><span class="p">,</span> <span class="n">edge_index</span> <span class="o">=</span> <span class="n">data</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">data</span><span class="p">.</span><span class="n">edge_index</span>
           <span class="n">x</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="nf">convs</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">edge_index</span><span class="o">=</span><span class="n">edge_index</span><span class="p">)</span>
           <span class="k">return</span> <span class="n">x</span>
-</code></pre></div> </div> </li> <li> <p>GCN</p> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="kn">import</span> <span class="n">torch</span>
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>GCN</p>
+
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="kn">import</span> <span class="n">torch</span>
   <span class="kn">from</span> <span class="n">torch_geometric.nn</span> <span class="kn">import</span> <span class="n">GCNConv</span>
     
   <span class="k">class</span> <span class="nc">GNN_GCN</span><span class="p">(</span><span class="n">torch</span><span class="p">.</span><span class="n">nn</span><span class="p">.</span><span class="n">Module</span><span class="p">):</span>
@@ -67,7 +299,12 @@
               <span class="n">x</span> <span class="o">=</span> <span class="nf">conv</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">edge_index</span><span class="o">=</span><span class="n">edge_index</span><span class="p">)</span>
           <span class="n">x</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="n">convs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">](</span><span class="n">x</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">)</span>
           <span class="k">return</span> <span class="n">x</span>
-</code></pre></div> </div> </li> <li> <p>SGC</p> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="kn">import</span> <span class="n">torch</span>
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>SGC</p>
+
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="kn">import</span> <span class="n">torch</span>
   <span class="kn">from</span> <span class="n">torch_geometric.nn</span> <span class="kn">import</span> <span class="n">SGConv</span>
     
   <span class="k">class</span> <span class="nc">GNN_SGC</span><span class="p">(</span><span class="n">torch</span><span class="p">.</span><span class="n">nn</span><span class="p">.</span><span class="n">Module</span><span class="p">):</span>
@@ -81,7 +318,25 @@
           <span class="n">x</span><span class="p">,</span> <span class="n">edge_index</span> <span class="o">=</span> <span class="n">data</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">data</span><span class="p">.</span><span class="n">edge_index</span>
           <span class="n">x</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="nf">conv1</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">)</span>
           <span class="k">return</span> <span class="n">x</span>
-</code></pre></div> </div> </li> </ul> <p>As for the measurement of <strong>efficiency</strong>, we take the message from [4] to heart. The authors of [4] suggest to draw plots using as multiple cost indicators, rather than highlighting only one. In this experiment, we consider the following cost indicators:</p> <ul> <li>FLOPs</li> <li>MACs</li> <li>Speed, measured by sec/graph (Note that in our experiments, we discard the use of mini-batch node sampling from GraphSAGE (Hamilton et al., 2017) and always use full-batch. Therefore the ‘sec/example’ from (Dehghani et al., 2022) naturally becomes sec/graph).</li> </ul> <p>This measures of cost indicator is quite different from the analysis made in the original SGC paper, as the main cost indicator is relative training time and wall-clock time. Also, ChebConv was not analyzed, and we expect it may bring potential discussion points.</p> <h2 id="experiment">Experiment</h2> <p>In the experiments, we will use the <em>deepspeed</em> library as the main profile tool for our analysis. The profiler in the experiments are built as:</p> <figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="n">deepspeed.profiling.flops_profiler.profiler</span> <span class="kn">import</span> <span class="n">FlopsProfiler</span>
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<p>As for the measurement of <strong>efficiency</strong>, we take the message from [4] to heart. The authors of [4] suggest to draw plots using as multiple cost indicators, rather than highlighting only one. In this experiment, we consider the following cost indicators:</p>
+
+<ul>
+  <li>FLOPs</li>
+  <li>MACs</li>
+  <li>Speed, measured by sec/graph (Note that in our experiments, we discard the use of mini-batch node sampling from GraphSAGE (Hamilton et al., 2017) and always use full-batch. Therefore the ‘sec/example’ from (Dehghani et al., 2022) naturally becomes sec/graph).</li>
+</ul>
+
+<p>This measures of cost indicator is quite different from the analysis made in the original SGC paper, as the main cost indicator is relative training time and wall-clock time. Also, ChebConv was not analyzed, and we expect it may bring potential discussion points.</p>
+
+<h2 id="experiment">Experiment</h2>
+
+<p>In the experiments, we will use the <em>deepspeed</em> library as the main profile tool for our analysis. The profiler in the experiments are built as:</p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="n">deepspeed.profiling.flops_profiler.profiler</span> <span class="kn">import</span> <span class="n">FlopsProfiler</span>
 
 
 <span class="k">class</span> <span class="nc">Custom_Profiler</span><span class="p">:</span>
@@ -102,7 +357,288 @@
         <span class="n">prof</span><span class="p">.</span><span class="nf">end_profile</span><span class="p">()</span>
         <span class="n">prof</span><span class="p">.</span><span class="nf">reset_profile</span><span class="p">()</span>
 
-        <span class="k">return</span> <span class="n">flops</span><span class="p">,</span> <span class="n">macs</span><span class="p">,</span> <span class="n">latency</span></code></pre></figure> <p>Now, lets plot FLOPs, MACs and latency of ChebConv, GCN, SGC for different receptive fields:</p> <div class="row mt-3"> <div class="col-sm mt-3 mt-md-0"> <figure> <picture> <source class="responsive-img-srcset" media="(max-width: 480px)" srcset="/assets/img/blog4_1-480.webp"/> <source class="responsive-img-srcset" media="(max-width: 800px)" srcset="/assets/img/blog4_1-800.webp"/> <source class="responsive-img-srcset" media="(max-width: 1400px)" srcset="/assets/img/blog4_1-1400.webp"/> <img src="/assets/img/blog4_1.png" class="img-fluid rounded z-depth-1" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();"/> </picture> </figure> </div> </div> <div class="caption"> Plot of FLOPs vs. receptive field. </div> <div class="row mt-3"> <div class="col-sm mt-3 mt-md-0"> <figure> <picture> <source class="responsive-img-srcset" media="(max-width: 480px)" srcset="/assets/img/blog4_2-480.webp"/> <source class="responsive-img-srcset" media="(max-width: 800px)" srcset="/assets/img/blog4_2-800.webp"/> <source class="responsive-img-srcset" media="(max-width: 1400px)" srcset="/assets/img/blog4_2-1400.webp"/> <img src="/assets/img/blog4_2.png" class="img-fluid rounded z-depth-1" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();"/> </picture> </figure> </div> </div> <div class="caption"> Plot of MACs vs. receptive field. </div> <div class="row mt-3"> <div class="col-sm mt-3 mt-md-0"> <figure> <picture> <source class="responsive-img-srcset" media="(max-width: 480px)" srcset="/assets/img/blog4_3-480.webp"/> <source class="responsive-img-srcset" media="(max-width: 800px)" srcset="/assets/img/blog4_3-800.webp"/> <source class="responsive-img-srcset" media="(max-width: 1400px)" srcset="/assets/img/blog4_3-1400.webp"/> <img src="/assets/img/blog4_3.png" class="img-fluid rounded z-depth-1" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();"/> </picture> </figure> </div> </div> <div class="caption"> Plot of Latency (sec/graph) vs. receptive field. </div> <ul> <li>For all three measures of cost indicators, ChebConv performs the worst out of all model architectures considered.</li> <li>For FLOPs and MACs, the difference between GCN and SGC are quite marginal, even as we stack the number of layers.</li> <li>For latency, thing are not as simple. When we do not use caching, SGC actually is quite slow compared to GCN. However, SGC becomes <em>very</em> fast with caching enabled, even beating GCNs with caching. Therefore it is strongly advised that we enable caching to True for SGC.</li> </ul> <h1 id="conclusion">Conclusion</h1> <p>Here, we have compared three important graph convolutional methods, ChebConv, GCN, and SGC. Experiments observing FLOPs, MACs and latency indicate that GCN and SGC are significantly efficient compared to ChebConv, and also the use of caching is critical in latency for SGC models.</p>]]></content><author><name></name></author><category term="Efficiency"/><category term="Graph_learning"/><summary type="html"><![CDATA[Introduction]]></summary></entry><entry><title type="html">Understanding ChebConv with the NEIGHBORSMATCH problem</title><link href="https://jordan7186.github.io/blog/2022/ChebConv/" rel="alternate" type="text/html" title="Understanding ChebConv with the NEIGHBORSMATCH problem"/><published>2022-10-30T00:00:00+00:00</published><updated>2022-10-30T00:00:00+00:00</updated><id>https://jordan7186.github.io/blog/2022/ChebConv</id><content type="html" xml:base="https://jordan7186.github.io/blog/2022/ChebConv/"><![CDATA[<h1 id="introduction">Introduction</h1> <p>We have seen in the last post about graph signal processing and the Fourier transformation of graph data. In summary, transforming a 1D signal defined on graphs with \(n\) nodes (denoted as \(\mathbf{g} \in \mathbb{R}^n\)) requires the matrix of eigenvectors of the Laplacian matrix \(L = D - A\). Assuming that we have decomposed the Laplacian as \(L = U\Lambda U^T\), the transformation can be written as:</p> \[\hat{\mathbf{g}}[l] = {\bf u}_l^{T}{\bf g}\] <p>where \(\mathbf{u}_l\) is the \(l\)-th column in \(U\).</p> <p>Filtering operations are also defined in the frequency domain. Now following the notation from (Defferrard et al., 2016), the convolution operation between two signals \(x\) and \(y\) on graph \(G\) is defined as:</p> \[x *_{G}y = U((U^Tx)\odot(U^Ty)),\] <p>where it transforms both \(x\) and \(y\) to the frequency domain (\(U^Tx\) and \(U^T y\)), perform the convolution operation (\((U^Tx)\odot(U^Ty)\)), and return to the original domain (\(U((U^Tx)\odot(U^Ty))\)). Note that from the <a href="https://en.wikipedia.org/wiki/Convolution_theorem">convolution theorem</a>, element-wise multiplications in the frequency domain is the same as convolution on the original domain. In the previous post, \(U^Ty\) is analogous to the filtering operation \(h(\Lambda)\), and \(x\) to \(\mathbf{g}\) (or vice versa, actually).</p> <p>However, the most widely used form of graph convolution (GCN model from Kipf &amp; Welling) is still far from the above formulation. Between GCN and the classical graph Fourier transform, an intermediate work (Defferrard et al., 2016) has been proposed to reduce the complexity, and thus proposing a learnable graph learning model that later inspired (Defferrard et al., 2016). We will try to understand the thought behind (Defferrard et al., 2016) and perform some analysis using an experiment proposed by (Alon &amp; Yahav, 2021).</p> <h1 id="chebconv">ChebConv</h1> <p>Firstly, let us assume that we are interested in learning a filter (or graph neural network) on a given graph \(G\). Based on the description above, the straightforward approach of modeling \(h(\Lambda)\) is just making the vector \(x \in \mathbb{R}^n\) learnable. This introduces a total of \(n\) parameters (this is the non-parametric filter in ChebConv).</p> <h3 id="two-modifications-from-non-parametric-filters">Two modifications from non-parametric filters</h3> <p>The first modification of ChebConv is to reduce the number of parameters from \(n\) to \(K\) (of course, \(K &lt; n\)) by setting \(h(\Lambda)\) as a polynomial filter. That is, the filter \(h(\Lambda)\) is now expressed with respect to polynomial basis (which is literally polynomials of \(\Lambda\): \(I\), \(\Lambda\), \(\Lambda^2\), \(\cdots\)) with coefficients \(\theta_k\):</p> \[h(\Lambda) = \sum_{k=0}^{K-1}\theta_k \Lambda^k.\] <p>Putting this version of the filter to process the graph signal \(x\):</p> \[\mathbf{h}(\Lambda)x = U (\sum_{k=0}^{K-1}\theta_k \Lambda^k) U^T x = \sum_{k=0}^{K-1}\theta_k (U\Lambda^kU^T)x = \sum_{k=0}^{K-1}\theta_k L^kx\] <p>(Note that \(UU^T = I\)).</p> <p>Now the filter is \(K\)-localized, according to [2]. Intuitively, assuming the Laplacian is \(L = D-A\), notice that \(L^{K-1} = (D-A)^{K-1}\) contains \(I\) to \(A^{K-1}\), suggesting that the new signal \(\mathbf{h}(\Lambda)x\) contains information from each node to its \((K-1)\)-hop neighbor.</p> <p>The second modification is to use the Chebyshev polynomials instead of the polynomial basis. This has a number of advantages, such as the use of orthogonal basis, and more importantly, increase in efficiency since the basis can be recursively defined:</p> \[\mathbf{h}(\Lambda) = \sum_{k=0}^{K-1} \theta_k T_k(\Lambda)\] <p>(ChebConv replaces \(\Lambda\) with the normalized version \(\tilde{\Lambda}\), but we will not consider this here).</p> <h3 id="implications-of-the-chebconv-formulation">Implications of the ChebConv formulation</h3> <p>As mentioned above, the main implication of this version of graph filtering is that now the convolution affects a <strong>local neighborhood of each node</strong>, determined by the number of basis used. We will see this effect directly using the NEIGHBORSMATCH problem (Alon &amp; Yahav, 2021).</p> <h1 id="observing-the-locality-effect">Observing the locality effect</h1> <h2 id="the-neighborsmatch-problem">The NEIGHBORSMATCH problem</h2> <p>Proposed by (Alon &amp; Yahav, 2021), the NEIGHBORSMATCH problem is a task involving synthetically generated graphs. The intention of the problem is to create a task with a specific <em>problem radius</em> (i.e., the required range of interaction between a node and its neighbors for the model to solve the problem). It generates a number of synthetically generated graphs with problem radius \(r\), and a graph neural networks (GNNs) is trained to solve the task. If the GNN has less than \(r\) layers, it cannot solve the problem whatsoever.</p> <h3 id="our-modification">Our modification</h3> <p>In our case, we slightly modify the NEIGHBORSMATCH problem to a more simpler configuration. Consider a synthetically generated graph below:</p> <div class="row mt-3"> <div class="col-sm mt-3 mt-md-0"> <figure> <picture> <source class="responsive-img-srcset" media="(max-width: 480px)" srcset="/assets/img/blog3_1-480.webp"/> <source class="responsive-img-srcset" media="(max-width: 800px)" srcset="/assets/img/blog3_1-800.webp"/> <source class="responsive-img-srcset" media="(max-width: 1400px)" srcset="/assets/img/blog3_1-1400.webp"/> <img src="/assets/img/blog3_1.png" class="img-fluid rounded z-depth-1" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();"/> </picture> </figure> </div> </div> <div class="caption"> Visualization of a single graph with depth 4. </div> <p>[Appendix 1: Source code for the simplified NEIGHBORSMATCH] [Appendix 2: Code for generation] [Appendix 3: Code for visualizing]</p> <p>Figure 1 visualizes a single graph within the dataset generated from the code. These are some features of the graph and the dataset:</p> <ul> <li>The graph is a full binary tree, with the root node colored in red in the Figure.</li> <li>Each node is assigned with a randomply assigned integer, which serves as the node features (in implementation, the integer is encoded as a one-hot vector).</li> <li>The assigned integers of the leaf node is different with the rest of the nodes within the graph.</li> <li>The integers of the leaf node is defined as the class label of the root node.</li> <li>Consequently, the integer of the root node does not have any relationships with the actual class label.</li> </ul> <p>Similar to the original version, given a dataset consisting of such graphs, we are interested in classifying the root node ‘directly’ by using a GNN model; that is, the GNN model is to compute the class probability of the root by aggregating the neighbor information w.r.t. the root node itself.</p> <p>A direct consequence of this is that the GNN cannot solve the NEIGHBORSMATCH problem unless it has aggregated information from the leaf node to the root node.</p> <h2 id="directly-observing-the-effect-of-k">Directly observing the effect of \(K\)</h2> <p>Here, we aim to observe the receptive field generated from the ChebConv using the modified NEIGHBOURSMATCH problem above. In the following experiment, we make a GNN model using <strong>exactly one ChebConv layer</strong> with a pre-defined value of \(K\). We try to observe whether our GNN model can solve this problem with different depths of the dataset.</p> <div class="row mt-3"> <div class="col-sm mt-3 mt-md-0"> <figure> <picture> <source class="responsive-img-srcset" media="(max-width: 480px)" srcset="/assets/img/blog3_2-480.webp"/> <source class="responsive-img-srcset" media="(max-width: 800px)" srcset="/assets/img/blog3_2-800.webp"/> <source class="responsive-img-srcset" media="(max-width: 1400px)" srcset="/assets/img/blog3_2-1400.webp"/> <img src="/assets/img/blog3_2.png" class="img-fluid rounded z-depth-1" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();"/> </picture> </figure> </div> </div> <div class="caption"> Performance heatmap with different depth and K values. </div> <p>[Appendix 4: Model code] [Appendix 5: Experiment code]</p> <ul> <li>We see in Figure 2 that for different values of depth for the NEIGHBORSMATCH dataset, ChebConv requires a localized filter that can at reach the leaf nodes. This is expected since the information crutial for solving the problem only exists at the feature vectors of the leaf node by design.</li> <li>Also, since the problem itself is very straightforward, the performance of the models for those that can solve is always near 1. This is despite the fact that we only used one layer of ChebConv without any non-linear actiavation functions.</li> <li>For the models that could not solve the problem, the performance degrades to a random classifier: The performance is always near \(\approx 1/(\text{num. of class})\).</li> </ul> <h2 id="chance-of-redemption-stacking-layers">Chance of redemption: Stacking layers</h2> <p>For ChebConv layers that does not have enough receptive field, we can still make the models solve the problem with a simple modification: <strong>stacking the layers</strong>. Since each convolutions aggregate information from the neighbors from the receptive field, stacking multiple convolutions will make the information travel more. This design choice is also highlighted in the next paper that we will cover (GCN).</p> <p>To see this effect, we will build several models using ChebConv layers, each with receptive field of \(K=2\). However, the task will be generated with varying depth values from 1 to 6 . In the first experiment (where we restricted ourselves to a one layer model), the model is bound to fail for depth greater than 1. In this experiment, we will attempt to stack layers for all depth values until the model can finally solve the problem.</p> <div class="row mt-3"> <div class="col-sm mt-3 mt-md-0"> <figure> <picture> <source class="responsive-img-srcset" media="(max-width: 480px)" srcset="/assets/img/blog3_3-480.webp"/> <source class="responsive-img-srcset" media="(max-width: 800px)" srcset="/assets/img/blog3_3-800.webp"/> <source class="responsive-img-srcset" media="(max-width: 1400px)" srcset="/assets/img/blog3_3-1400.webp"/> <img src="/assets/img/blog3_3.png" class="img-fluid rounded z-depth-1" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();"/> </picture> </figure> </div> </div> <div class="caption"> Performance heatmap with different depths and the number of layers (K=2). </div> <p>[Appendix 6: Model code] [Appendix 7: Experiment log]</p> <p>Here, we can see that stacking enough layers, the model will eventually be able to solve the task. Also notice that for the cases where the model fails, the performance is roughly \(1/(\text{num. of classes})\), indicating that the model is basically a random classifier. Let’s look at an another case where we stack ChebConv layers with \(K=3\):</p> <div class="row mt-3"> <div class="col-sm mt-3 mt-md-0"> <figure> <picture> <source class="responsive-img-srcset" media="(max-width: 480px)" srcset="/assets/img/blog3_4-480.webp"/> <source class="responsive-img-srcset" media="(max-width: 800px)" srcset="/assets/img/blog3_4-800.webp"/> <source class="responsive-img-srcset" media="(max-width: 1400px)" srcset="/assets/img/blog3_4-1400.webp"/> <img src="/assets/img/blog3_4.png" class="img-fluid rounded z-depth-1" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();"/> </picture> </figure> </div> </div> <div class="caption"> Performance heatmap with different depths and number of layers (K=3). </div> <p>[Appendix 8: Experiment log]</p> <p>As expected, the depth that the model can solve now increases twice as fast per layer compared to the case when \(K=2\). Note that there are no benefits of stacking layers for \(K=1\) for solving NEIGHBORSMATCH as it only learns filters of itself (remember the first term of the Chebyshev polynomial is the identity matrix \(I\)) and does not take neighbor nodes into consideration.</p> <h1 id="conclusions">Conclusions</h1> <p>We have observed the main idea of ChebConv, along with its interpretation in terms of receptive field. Running various experiments on the NEIGHBORSMATCH problem, we were able to directly observe the effect of \(K\) on the solvability of the task, which is designed to be solved with a model that can cover the task’s problem radius.</p> <h1 id="appendix">Appendix</h1> <h2 id="appendix-1">Appendix 1</h2> <figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="n">torch</span>
+        <span class="k">return</span> <span class="n">flops</span><span class="p">,</span> <span class="n">macs</span><span class="p">,</span> <span class="n">latency</span></code></pre></figure>
+
+<p>Now, lets plot FLOPs, MACs and latency of ChebConv, GCN, SGC for different receptive fields:</p>
+
+<div class="row mt-3">
+    <div class="col-sm mt-3 mt-md-0">
+        <figure>
+
+  <picture>
+    
+    <source class="responsive-img-srcset" media="(max-width: 480px)" srcset="/assets/img/blog4_1-480.webp" />
+    <source class="responsive-img-srcset" media="(max-width: 800px)" srcset="/assets/img/blog4_1-800.webp" />
+    <source class="responsive-img-srcset" media="(max-width: 1400px)" srcset="/assets/img/blog4_1-1400.webp" />
+    
+
+    <!-- Fallback to the original file -->
+    <img src="/assets/img/blog4_1.png" class="img-fluid rounded z-depth-1" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();" />
+  </picture>
+
+</figure>
+
+    </div>
+</div>
+<div class="caption">
+  Plot of FLOPs vs. receptive field.
+</div>
+
+<div class="row mt-3">
+    <div class="col-sm mt-3 mt-md-0">
+        <figure>
+
+  <picture>
+    
+    <source class="responsive-img-srcset" media="(max-width: 480px)" srcset="/assets/img/blog4_2-480.webp" />
+    <source class="responsive-img-srcset" media="(max-width: 800px)" srcset="/assets/img/blog4_2-800.webp" />
+    <source class="responsive-img-srcset" media="(max-width: 1400px)" srcset="/assets/img/blog4_2-1400.webp" />
+    
+
+    <!-- Fallback to the original file -->
+    <img src="/assets/img/blog4_2.png" class="img-fluid rounded z-depth-1" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();" />
+  </picture>
+
+</figure>
+
+    </div>
+</div>
+<div class="caption">
+  Plot of MACs vs. receptive field.
+</div>
+
+<div class="row mt-3">
+    <div class="col-sm mt-3 mt-md-0">
+        <figure>
+
+  <picture>
+    
+    <source class="responsive-img-srcset" media="(max-width: 480px)" srcset="/assets/img/blog4_3-480.webp" />
+    <source class="responsive-img-srcset" media="(max-width: 800px)" srcset="/assets/img/blog4_3-800.webp" />
+    <source class="responsive-img-srcset" media="(max-width: 1400px)" srcset="/assets/img/blog4_3-1400.webp" />
+    
+
+    <!-- Fallback to the original file -->
+    <img src="/assets/img/blog4_3.png" class="img-fluid rounded z-depth-1" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();" />
+  </picture>
+
+</figure>
+
+    </div>
+</div>
+<div class="caption">
+  Plot of Latency (sec/graph) vs. receptive field.
+</div>
+
+<ul>
+  <li>For all three measures of cost indicators, ChebConv performs the worst out of all model architectures considered.</li>
+  <li>For FLOPs and MACs, the difference between GCN and SGC are quite marginal, even as we stack the number of layers.</li>
+  <li>For latency, thing are not as simple. When we do not use caching, SGC actually is quite slow compared to GCN. However, SGC becomes <em>very</em> fast with caching enabled, even beating GCNs with caching. Therefore it is strongly advised that we enable caching to True for SGC.</li>
+</ul>
+
+<h1 id="conclusion">Conclusion</h1>
+
+<p>Here, we have compared three important graph convolutional methods, ChebConv, GCN, and SGC. Experiments observing FLOPs, MACs and latency indicate that GCN and SGC are significantly efficient compared to ChebConv, and also the use of caching is critical in latency for SGC models.</p>]]></content><author><name></name></author><category term="Efficiency" /><category term="Graph_learning" /><summary type="html"><![CDATA[Introduction]]></summary></entry><entry><title type="html">Understanding ChebConv with the NEIGHBORSMATCH problem</title><link href="https://jordan7186.github.io/blog/2022/ChebConv/" rel="alternate" type="text/html" title="Understanding ChebConv with the NEIGHBORSMATCH problem" /><published>2022-10-30T00:00:00+00:00</published><updated>2022-10-30T00:00:00+00:00</updated><id>https://jordan7186.github.io/blog/2022/ChebConv</id><content type="html" xml:base="https://jordan7186.github.io/blog/2022/ChebConv/"><![CDATA[<h1 id="introduction">Introduction</h1>
+
+<p>We have seen in the last post about graph signal processing and the Fourier transformation of graph data. In summary, transforming a 1D signal defined on graphs with \(n\) nodes (denoted as \(\mathbf{g} \in \mathbb{R}^n\)) requires the matrix of eigenvectors of the Laplacian matrix \(L = D - A\). Assuming that we have decomposed the Laplacian as \(L = U\Lambda U^T\), the transformation can be written as:</p>
+
+\[\hat{\mathbf{g}}[l] = {\bf u}_l^{T}{\bf g}\]
+
+<p>where \(\mathbf{u}_l\) is the \(l\)-th column in \(U\).</p>
+
+<p>Filtering operations are also defined in the frequency domain. Now following the notation from (Defferrard et al., 2016), the convolution operation between two signals \(x\) and \(y\) on graph \(G\) is defined as:</p>
+
+\[x *_{G}y = U((U^Tx)\odot(U^Ty)),\]
+
+<p>where it transforms both \(x\) and \(y\) to the frequency domain (\(U^Tx\) and \(U^T y\)), perform the convolution operation (\((U^Tx)\odot(U^Ty)\)), and return to the original domain (\(U((U^Tx)\odot(U^Ty))\)). Note that from the <a href="https://en.wikipedia.org/wiki/Convolution_theorem">convolution theorem</a>, element-wise multiplications in the frequency domain is the same as convolution on the original domain. In the previous post, \(U^Ty\) is analogous to the filtering operation \(h(\Lambda)\), and \(x\) to \(\mathbf{g}\) (or vice versa, actually).</p>
+
+<p>However, the most widely used form of graph convolution (GCN model from Kipf &amp; Welling) is still far from the above formulation. Between GCN and the classical graph Fourier transform, an intermediate work (Defferrard et al., 2016) has been proposed to reduce the complexity, and thus proposing a learnable graph learning model that later inspired (Defferrard et al., 2016). We will try to understand the thought behind (Defferrard et al., 2016) and perform some analysis using an experiment proposed by (Alon &amp; Yahav, 2021).</p>
+
+<h1 id="chebconv">ChebConv</h1>
+
+<p>Firstly, let us assume that we are interested in learning a filter (or graph neural network) on a given graph \(G\). Based on the description above, the straightforward approach of modeling \(h(\Lambda)\) is just making the vector \(x \in \mathbb{R}^n\) learnable. This introduces a total of \(n\) parameters (this is the non-parametric filter in ChebConv).</p>
+
+<h3 id="two-modifications-from-non-parametric-filters">Two modifications from non-parametric filters</h3>
+
+<p>The first modification of ChebConv is to reduce the number of parameters from \(n\) to \(K\) (of course, \(K &lt; n\)) by setting \(h(\Lambda)\) as a polynomial filter. That is, the filter \(h(\Lambda)\) is now expressed with respect to polynomial basis (which is literally polynomials of \(\Lambda\): \(I\), \(\Lambda\), \(\Lambda^2\), \(\cdots\)) with coefficients \(\theta_k\):</p>
+
+\[h(\Lambda) = \sum_{k=0}^{K-1}\theta_k \Lambda^k.\]
+
+<p>Putting this version of the filter to process the graph signal \(x\):</p>
+
+\[\mathbf{h}(\Lambda)x = U (\sum_{k=0}^{K-1}\theta_k \Lambda^k) U^T x = \sum_{k=0}^{K-1}\theta_k (U\Lambda^kU^T)x = \sum_{k=0}^{K-1}\theta_k L^kx\]
+
+<p>(Note that \(UU^T = I\)).</p>
+
+<p>Now the filter is \(K\)-localized, according to [2]. Intuitively, assuming the Laplacian is \(L = D-A\), notice that \(L^{K-1} = (D-A)^{K-1}\) contains \(I\) to \(A^{K-1}\), suggesting that the new signal \(\mathbf{h}(\Lambda)x\) contains information from each node to its \((K-1)\)-hop neighbor.</p>
+
+<p>The second modification is to use the Chebyshev polynomials instead of the polynomial basis. This has a number of advantages, such as the use of orthogonal basis, and more importantly, increase in efficiency since the basis can be recursively defined:</p>
+
+\[\mathbf{h}(\Lambda) = \sum_{k=0}^{K-1} \theta_k T_k(\Lambda)\]
+
+<p>(ChebConv replaces \(\Lambda\) with the normalized version \(\tilde{\Lambda}\), but we will not consider this here).</p>
+
+<h3 id="implications-of-the-chebconv-formulation">Implications of the ChebConv formulation</h3>
+
+<p>As mentioned above, the main implication of this version of graph filtering is that now the convolution affects a <strong>local neighborhood of each node</strong>, determined by the number of basis used. We will see this effect directly using the NEIGHBORSMATCH problem (Alon &amp; Yahav, 2021).</p>
+
+<h1 id="observing-the-locality-effect">Observing the locality effect</h1>
+
+<h2 id="the-neighborsmatch-problem">The NEIGHBORSMATCH problem</h2>
+
+<p>Proposed by (Alon &amp; Yahav, 2021), the NEIGHBORSMATCH problem is a task involving synthetically generated graphs. The intention of the problem is to create a task with a specific <em>problem radius</em> (i.e., the required range of interaction between a node and its neighbors for the model to solve the problem). It generates a number of synthetically generated graphs with problem radius \(r\), and a graph neural networks (GNNs) is trained to solve the task. If the GNN has less than \(r\) layers, it cannot solve the problem whatsoever.</p>
+
+<h3 id="our-modification">Our modification</h3>
+
+<p>In our case, we slightly modify the NEIGHBORSMATCH problem to a more simpler configuration. Consider a synthetically generated graph below:</p>
+
+<div class="row mt-3">
+    <div class="col-sm mt-3 mt-md-0">
+        <figure>
+
+  <picture>
+    
+    <source class="responsive-img-srcset" media="(max-width: 480px)" srcset="/assets/img/blog3_1-480.webp" />
+    <source class="responsive-img-srcset" media="(max-width: 800px)" srcset="/assets/img/blog3_1-800.webp" />
+    <source class="responsive-img-srcset" media="(max-width: 1400px)" srcset="/assets/img/blog3_1-1400.webp" />
+    
+
+    <!-- Fallback to the original file -->
+    <img src="/assets/img/blog3_1.png" class="img-fluid rounded z-depth-1" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();" />
+  </picture>
+
+</figure>
+
+    </div>
+</div>
+<div class="caption">
+  Visualization of a single graph with depth 4.
+</div>
+
+<p>[Appendix 1: Source code for the simplified NEIGHBORSMATCH]
+[Appendix 2: Code for generation]
+[Appendix 3: Code for visualizing]</p>
+
+<p>Figure 1 visualizes a single graph within the dataset generated from the code.  These are some features of the graph and the dataset:</p>
+
+<ul>
+  <li>The graph is a full binary tree, with the root node colored in red in the Figure.</li>
+  <li>Each node is assigned with a randomply assigned integer, which serves as the node features (in implementation, the integer is encoded as a one-hot vector).</li>
+  <li>The assigned integers of the leaf node is different with the rest of the nodes within the graph.</li>
+  <li>The integers of the leaf node is defined as the class label of the root node.</li>
+  <li>Consequently, the integer of the root node does not have any relationships with the actual class label.</li>
+</ul>
+
+<p>Similar to the original version, given a dataset consisting of such graphs, we are interested in classifying the root node ‘directly’ by using a GNN model; that is, the GNN model is to compute the class probability of the root by aggregating the neighbor information w.r.t. the root node itself.</p>
+
+<p>A direct consequence of this is that the GNN cannot solve the NEIGHBORSMATCH problem unless it has aggregated information from the leaf node to the root node.</p>
+
+<h2 id="directly-observing-the-effect-of-k">Directly observing the effect of \(K\)</h2>
+
+<p>Here, we aim to observe the receptive field generated from the ChebConv using the modified NEIGHBOURSMATCH problem above. In the following experiment, we make a GNN model using <strong>exactly one ChebConv layer</strong> with a pre-defined value of \(K\). We try to observe whether our GNN model can solve this problem with different depths of the dataset.</p>
+
+<div class="row mt-3">
+    <div class="col-sm mt-3 mt-md-0">
+        <figure>
+
+  <picture>
+    
+    <source class="responsive-img-srcset" media="(max-width: 480px)" srcset="/assets/img/blog3_2-480.webp" />
+    <source class="responsive-img-srcset" media="(max-width: 800px)" srcset="/assets/img/blog3_2-800.webp" />
+    <source class="responsive-img-srcset" media="(max-width: 1400px)" srcset="/assets/img/blog3_2-1400.webp" />
+    
+
+    <!-- Fallback to the original file -->
+    <img src="/assets/img/blog3_2.png" class="img-fluid rounded z-depth-1" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();" />
+  </picture>
+
+</figure>
+
+    </div>
+</div>
+<div class="caption">
+  Performance heatmap with different depth and K values.
+</div>
+
+<p>[Appendix 4: Model code]
+[Appendix 5: Experiment code]</p>
+
+<ul>
+  <li>We see in Figure 2 that for different values of depth for the NEIGHBORSMATCH dataset, ChebConv requires a localized filter that can at reach the leaf nodes. This is expected since the information crutial for solving the problem only exists at the feature vectors of the leaf node by design.</li>
+  <li>Also, since the problem itself is very straightforward, the performance of the models for those that can solve is always near 1. This is despite the fact that we only used one layer of ChebConv without any non-linear actiavation functions.</li>
+  <li>For the models that could not solve the problem, the performance degrades to a random classifier: The performance is always near \(\approx 1/(\text{num. of class})\).</li>
+</ul>
+
+<h2 id="chance-of-redemption-stacking-layers">Chance of redemption: Stacking layers</h2>
+
+<p>For ChebConv layers that does not have enough receptive field, we can still make the models solve the problem with a simple modification: <strong>stacking the layers</strong>. Since each convolutions aggregate information from the neighbors from the receptive field, stacking multiple convolutions will make the information travel more. This design choice is also highlighted in the next paper that we will cover (GCN).</p>
+
+<p>To see this effect, we will build several models using ChebConv layers, each with receptive field of \(K=2\). However, the task will be generated with varying depth values from 1 to 6 . In the first experiment (where we restricted ourselves to a one layer model), the model is bound to fail for depth greater than 1. In this experiment, we will attempt to stack layers for all depth values until the model can finally solve the problem.</p>
+
+<div class="row mt-3">
+    <div class="col-sm mt-3 mt-md-0">
+        <figure>
+
+  <picture>
+    
+    <source class="responsive-img-srcset" media="(max-width: 480px)" srcset="/assets/img/blog3_3-480.webp" />
+    <source class="responsive-img-srcset" media="(max-width: 800px)" srcset="/assets/img/blog3_3-800.webp" />
+    <source class="responsive-img-srcset" media="(max-width: 1400px)" srcset="/assets/img/blog3_3-1400.webp" />
+    
+
+    <!-- Fallback to the original file -->
+    <img src="/assets/img/blog3_3.png" class="img-fluid rounded z-depth-1" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();" />
+  </picture>
+
+</figure>
+
+    </div>
+</div>
+<div class="caption">
+  Performance heatmap with different depths and the number of layers (K=2).
+</div>
+
+<p>[Appendix 6: Model code]
+[Appendix 7: Experiment log]</p>
+
+<p>Here, we can see that stacking enough layers, the model will eventually be able to solve the task. Also notice that for the cases where the model fails, the performance is roughly \(1/(\text{num. of classes})\), indicating that the model is basically a random classifier. Let’s look at an another case where we stack ChebConv layers with \(K=3\):</p>
+
+<div class="row mt-3">
+    <div class="col-sm mt-3 mt-md-0">
+        <figure>
+
+  <picture>
+    
+    <source class="responsive-img-srcset" media="(max-width: 480px)" srcset="/assets/img/blog3_4-480.webp" />
+    <source class="responsive-img-srcset" media="(max-width: 800px)" srcset="/assets/img/blog3_4-800.webp" />
+    <source class="responsive-img-srcset" media="(max-width: 1400px)" srcset="/assets/img/blog3_4-1400.webp" />
+    
+
+    <!-- Fallback to the original file -->
+    <img src="/assets/img/blog3_4.png" class="img-fluid rounded z-depth-1" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();" />
+  </picture>
+
+</figure>
+
+    </div>
+</div>
+<div class="caption">
+  Performance heatmap with different depths and number of layers (K=3).
+</div>
+
+<p>[Appendix 8: Experiment log]</p>
+
+<p>As expected, the depth that the model can solve now increases twice as fast per layer compared to the case when \(K=2\). Note that there are no benefits of stacking layers for \(K=1\) for solving NEIGHBORSMATCH as it only learns filters of itself (remember the first term of the Chebyshev polynomial is the identity matrix \(I\)) and does not take neighbor nodes into consideration.</p>
+
+<h1 id="conclusions">Conclusions</h1>
+
+<p>We have observed the main idea of ChebConv, along with its interpretation in terms of receptive field. Running various experiments on the NEIGHBORSMATCH problem, we were able to directly observe the effect of \(K\) on the solvability of the task, which is designed to be solved with a model that can cover the task’s problem radius.</p>
+
+<h1 id="appendix">Appendix</h1>
+
+<h2 id="appendix-1">Appendix 1</h2>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="n">torch</span>
 <span class="kn">import</span> <span class="n">torch_geometric</span>
 <span class="kn">from</span> <span class="n">torch_geometric.data</span> <span class="kn">import</span> <span class="n">Data</span>
 <span class="kn">from</span> <span class="n">torch.nn</span> <span class="kn">import</span> <span class="n">functional</span> <span class="k">as</span> <span class="n">F</span>
@@ -185,12 +721,20 @@ Alon &amp; Yahav, </span><span class="sh">"</span><span class="s">ON THE BOTTLEN
         <span class="n">feature_ind</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nc">LongTensor</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">self</span><span class="p">.</span><span class="n">num_nodes</span><span class="p">)</span>
         <span class="n">feature_ind</span><span class="p">[</span><span class="n">self</span><span class="p">.</span><span class="n">leaf_indices</span><span class="p">]</span> <span class="o">=</span> <span class="n">label</span>
 
-        <span class="k">return</span> <span class="n">torch</span><span class="p">.</span><span class="nc">Tensor</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">feature_constructor</span><span class="p">[</span><span class="n">feature_ind</span><span class="p">]),</span> <span class="n">label</span></code></pre></figure> <h2 id="appendix-2">Appendix 2</h2> <figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="sh">"""</span><span class="s">
+        <span class="k">return</span> <span class="n">torch</span><span class="p">.</span><span class="nc">Tensor</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">feature_constructor</span><span class="p">[</span><span class="n">feature_ind</span><span class="p">]),</span> <span class="n">label</span></code></pre></figure>
+
+<h2 id="appendix-2">Appendix 2</h2>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="sh">"""</span><span class="s">
 Code for generating the dataset
 Modify the depth, num_of_class, and train_fraction for your need
 </span><span class="sh">"""</span>
 <span class="n">tree</span> <span class="o">=</span> <span class="nc">TreeDataset</span><span class="p">(</span><span class="n">depth</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">num_of_class</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
-<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span> <span class="o">=</span> <span class="n">tree</span><span class="p">.</span><span class="nf">generate_data</span><span class="p">(</span><span class="n">train_fraction</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span></code></pre></figure> <h2 id="appendix-3">Appendix 3</h2> <figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="sh">"""</span><span class="s">
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span> <span class="o">=</span> <span class="n">tree</span><span class="p">.</span><span class="nf">generate_data</span><span class="p">(</span><span class="n">train_fraction</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span></code></pre></figure>
+
+<h2 id="appendix-3">Appendix 3</h2>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="sh">"""</span><span class="s">
 Code for visualizing one of the dataset.
 </span><span class="sh">"""</span>
 <span class="kn">import</span> <span class="n">networkx</span> <span class="k">as</span> <span class="n">nx</span>
@@ -206,7 +750,11 @@ Code for visualizing one of the dataset.
 <span class="c1"># Draw via networkx
 </span><span class="n">plt</span><span class="p">.</span><span class="nf">figure</span><span class="p">(</span><span class="n">dpi</span> <span class="o">=</span> <span class="mi">120</span><span class="p">)</span>
 <span class="n">plt</span><span class="p">.</span><span class="nf">title</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">Example (Class label </span><span class="si">{</span><span class="n">X_train</span><span class="p">[</span><span class="n">ind</span><span class="p">].</span><span class="n">y</span><span class="si">}</span><span class="s">)</span><span class="sh">"</span><span class="p">)</span>
-<span class="n">nx</span><span class="p">.</span><span class="nf">draw</span><span class="p">(</span><span class="n">tree_nx</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">labeldict</span><span class="p">,</span> <span class="n">with_labels</span> <span class="o">=</span> <span class="bp">True</span><span class="p">,</span> <span class="n">node_color</span> <span class="o">=</span> <span class="n">color</span><span class="p">,</span> <span class="n">node_size</span> <span class="o">=</span> <span class="mi">100</span><span class="p">)</span></code></pre></figure> <h2 id="appendix-4">Appendix 4</h2> <figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="n">torch_geometric.nn</span> <span class="kn">import</span> <span class="n">ChebConv</span>
+<span class="n">nx</span><span class="p">.</span><span class="nf">draw</span><span class="p">(</span><span class="n">tree_nx</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">labeldict</span><span class="p">,</span> <span class="n">with_labels</span> <span class="o">=</span> <span class="bp">True</span><span class="p">,</span> <span class="n">node_color</span> <span class="o">=</span> <span class="n">color</span><span class="p">,</span> <span class="n">node_size</span> <span class="o">=</span> <span class="mi">100</span><span class="p">)</span></code></pre></figure>
+
+<h2 id="appendix-4">Appendix 4</h2>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="n">torch_geometric.nn</span> <span class="kn">import</span> <span class="n">ChebConv</span>
 
 
 <span class="k">class</span> <span class="nc">GNN</span><span class="p">(</span><span class="n">torch</span><span class="p">.</span><span class="n">nn</span><span class="p">.</span><span class="n">Module</span><span class="p">):</span>
@@ -227,7 +775,11 @@ Code for visualizing one of the dataset.
         <span class="k">for</span> <span class="n">conv</span> <span class="ow">in</span> <span class="n">self</span><span class="p">.</span><span class="n">convs</span><span class="p">:</span>
             <span class="n">x</span> <span class="o">=</span> <span class="nf">conv</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">edge_index</span><span class="o">=</span><span class="n">edge_index</span><span class="p">,</span> <span class="n">batch</span><span class="o">=</span><span class="n">batch</span><span class="p">)</span>
         <span class="n">root_index</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nc">LongTensor</span><span class="p">(</span><span class="nf">list</span><span class="p">(</span><span class="nf">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nf">len</span><span class="p">(</span><span class="n">batch</span><span class="p">),</span> <span class="n">num_nodes</span><span class="p">)))</span>
-        <span class="k">return</span> <span class="n">x</span><span class="p">[</span><span class="n">root_index</span><span class="p">]</span></code></pre></figure> <h2 id="appendix-5">Appendix 5</h2> <figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="n">torch</span>
+        <span class="k">return</span> <span class="n">x</span><span class="p">[</span><span class="n">root_index</span><span class="p">]</span></code></pre></figure>
+
+<h2 id="appendix-5">Appendix 5</h2>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="n">torch</span>
 <span class="kn">import</span> <span class="n">torch.nn.functional</span> <span class="k">as</span> <span class="n">F</span>
 <span class="kn">from</span> <span class="n">torch_geometric.nn</span> <span class="kn">import</span> <span class="n">ChebConv</span>
 <span class="kn">from</span> <span class="n">torch_geometric.loader</span> <span class="kn">import</span> <span class="n">DataLoader</span>
@@ -341,7 +893,11 @@ Run the actual experiment
 <span class="n">K</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="n">performance</span><span class="p">:</span> <span class="mf">1.0</span>
 <span class="n">K</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="n">performance</span><span class="p">:</span> <span class="mf">1.0</span>
 <span class="n">K</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="n">performance</span><span class="p">:</span> <span class="mf">1.0</span>
-<span class="n">K</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="n">performance</span><span class="p">:</span> <span class="mf">1.0</span></code></pre></figure> <h2 id="appendix-6">Appendix 6</h2> <figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">GNN_new</span><span class="p">(</span><span class="n">torch</span><span class="p">.</span><span class="n">nn</span><span class="p">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="n">K</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="n">performance</span><span class="p">:</span> <span class="mf">1.0</span></code></pre></figure>
+
+<h2 id="appendix-6">Appendix 6</h2>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">GNN_new</span><span class="p">(</span><span class="n">torch</span><span class="p">.</span><span class="n">nn</span><span class="p">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">in_channels</span><span class="p">,</span> <span class="n">out_channels</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">num_layers</span><span class="p">):</span>
         <span class="nf">super</span><span class="p">().</span><span class="nf">__init__</span><span class="p">()</span>
         <span class="n">self</span><span class="p">.</span><span class="n">num_layers</span> <span class="o">=</span>  <span class="n">num_layers</span>
@@ -358,7 +914,11 @@ Run the actual experiment
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">num_layers</span><span class="p">):</span>
             <span class="n">x</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="n">convs</span><span class="p">[</span><span class="n">i</span><span class="p">](</span><span class="n">x</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">)</span>
         <span class="n">root_index</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nc">LongTensor</span><span class="p">(</span><span class="nf">list</span><span class="p">(</span><span class="nf">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nf">len</span><span class="p">(</span><span class="n">batch</span><span class="p">),</span> <span class="n">num_nodes</span><span class="p">)))</span>
-        <span class="k">return</span> <span class="n">x</span><span class="p">[</span><span class="n">root_index</span><span class="p">,</span> <span class="p">:]</span></code></pre></figure> <h2 id="appendix-7">Appendix 7</h2> <figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">Num_layers</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="n">performance</span><span class="p">:</span> <span class="mf">1.0</span>
+        <span class="k">return</span> <span class="n">x</span><span class="p">[</span><span class="n">root_index</span><span class="p">,</span> <span class="p">:]</span></code></pre></figure>
+
+<h2 id="appendix-7">Appendix 7</h2>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">Num_layers</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="n">performance</span><span class="p">:</span> <span class="mf">1.0</span>
 <span class="n">Num_layers</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="n">performance</span><span class="p">:</span> <span class="mf">0.146</span>
 <span class="n">Num_layers</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="n">performance</span><span class="p">:</span> <span class="mf">0.14475</span>
 <span class="n">Num_layers</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="n">performance</span><span class="p">:</span> <span class="mf">0.14725</span>
@@ -393,7 +953,11 @@ Run the actual experiment
 <span class="n">Num_layers</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="n">performance</span><span class="p">:</span> <span class="mf">1.0</span>
 <span class="n">Num_layers</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="n">performance</span><span class="p">:</span> <span class="mf">1.0</span>
 <span class="n">Num_layers</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="n">performance</span><span class="p">:</span> <span class="mf">1.0</span>
-<span class="n">Num_layers</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="n">performance</span><span class="p">:</span> <span class="mf">1.0</span></code></pre></figure> <h2 id="appendix-8">Appendix 8</h2> <figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">Num_layers</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="n">performance</span><span class="p">:</span> <span class="mf">1.0</span>
+<span class="n">Num_layers</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="n">performance</span><span class="p">:</span> <span class="mf">1.0</span></code></pre></figure>
+
+<h2 id="appendix-8">Appendix 8</h2>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">Num_layers</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="n">performance</span><span class="p">:</span> <span class="mf">1.0</span>
 <span class="n">Num_layers</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="n">performance</span><span class="p">:</span> <span class="mf">1.0</span>
 <span class="n">Num_layers</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="n">performance</span><span class="p">:</span> <span class="mf">0.145</span>
 <span class="n">Num_layers</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="n">performance</span><span class="p">:</span> <span class="mf">0.14575</span>
@@ -410,7 +974,85 @@ Run the actual experiment
 <span class="n">Num_layers</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="n">performance</span><span class="p">:</span> <span class="mf">1.0</span>
 <span class="n">Num_layers</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="n">performance</span><span class="p">:</span> <span class="mf">1.0</span>
 <span class="n">Num_layers</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="n">performance</span><span class="p">:</span> <span class="mf">1.0</span>
-<span class="n">Num_layers</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="n">performance</span><span class="p">:</span> <span class="mf">1.0</span></code></pre></figure>]]></content><author><name></name></author><category term="ChebConv"/><category term="Graph_learning"/><summary type="html"><![CDATA[Introduction]]></summary></entry><entry><title type="html">Dissecting Cora in the Spectral Domain</title><link href="https://jordan7186.github.io/blog/2022/Cora_spectral/" rel="alternate" type="text/html" title="Dissecting Cora in the Spectral Domain"/><published>2022-10-19T00:00:00+00:00</published><updated>2022-10-19T00:00:00+00:00</updated><id>https://jordan7186.github.io/blog/2022/Cora_spectral</id><content type="html" xml:base="https://jordan7186.github.io/blog/2022/Cora_spectral/"><![CDATA[<h1 id="introduction">Introduction</h1> <p>In graph signal processing (GSP), graph data is analyzed in the Fourier domain. Although Fourier analysis itself is already well-known on other types of data, extending the Fourier transform for analysis on <strong>graph data</strong> is quite interesting and worth diving into.</p> <p>This post concerns the basic idea of GSP and further investigates its application with the Cora dataset.</p> <h1 id="notations">Notations</h1> <p>For ease of description, let us define some notations and assumptions before moving on.</p> <h2 id="basic-graph-notations">Basic graph notations</h2> <ul> <li>Let us assume a graph \(G=(V, E)\) is given, where \(V\) is the set of nodes and \(E\).</li> <li>The number of nodes in the graph is \(n\).</li> <li>It makes life simple if we think of each node \(i \in V\) also as natural numbers (\(i = 1, \cdots, n\)).</li> <li>The adjacency matrix is denoted as \(A\), and the degree matrix as \(D = diag(d_1, \cdots, d_n)\) where \(d_i = \sum_{j=1}^n A_{ij}\).</li> </ul> <h2 id="graph-signals">Graph signals</h2> <ul> <li>For each node \(i \in V\), a single scalar is assigned as the signal of the node. Its basically the same as defining the node feature matrix, where the dimension of the features is one.</li> <li>The graph signal is represented as a \(n\)-dimensional vector \({\bf g} \in \mathbb{R}^{n}\). Making our notations pytorch-like, the signal for node \(i\) is denoted as \({\bf g}[i] \in \mathbb{R}\) (But here \(i\) starts at 1, not zero).</li> </ul> <h1 id="extension-of-fourier-transform-to-graphs">Extension of Fourier transform to graphs</h1> <h3 id="1d-fourier-transform">1D Fourier transform</h3> <p>Fourier transforms enables us to view the given data from the original domain (such as time) to the frequency domain. To apply such transformations to graph signals (data defined on graphs), we need to first generalize the Fourier transformation itself. This insight is nicely described in (Shuman et al., 2013), which we will follow also.</p> <p>The most frequent <del>(no pun intended)</del> equation that you might have encountered when looking up for Fourier transformation would be the following:</p> \[\hat{f}(\zeta) = \int_{\mathbb{R}} f(t) e^{-2 \pi i \zeta t} dt,\] <p>where the function \(f\) defined on the (probably) time domain (i.e., \(t\)) is transformed into a function \(\hat{f}\) defined on the frequency domain (i.e., \(\zeta\)). The interpretation of the integral itself is beautifully described by 3Blue1Brown (<a href="https://www.youtube.com/watch?v=spUNpyF58BY">link</a>).</p> <p>In more general terms, the Fourier transformation can be thought of as the inner product between the original function and the eigenfunctions of the Laplace operator. Concretely,</p> \[\hat{f}(\zeta) = &lt;f, e^{2\pi i\zeta i}&gt;,\] <p>and you can see the first equation naturally aligns with the general definition of Fourier transform. Eq. (2) in (Shuman et al., 2013) also shows that \(e^{2\pi i \zeta i}\) is indeed the eigenfunction of the Laplace operator in 1D.</p> <h3 id="graph-fourier-transform">Graph fourier transform</h3> <p>This generalized definition provides the way to extend the Fourier transformation to graph data. By reminding that the graph data is a discrete data that are represented as vectors rather than functions, the extension of Fourier transform is now clear : 1) Get the eigen<strong>vectors</strong> of the Laplacian <strong>matrix</strong> 2) Inner product with the original graph signal.</p> <p>More concretely, the transformed graph signal is described as:</p> \[\hat{\mathbf{g}}[l] = &lt;{\bf g}, {\bf u}_l&gt;,\] <p>where \({\bf u}_l\) is the eigvenvector corresponding to the \(l\)-th lowest eigenvalue of the Laplacian matrix (\(l = 1, \cdots, n\)). Notice that the domain has shifted from \(i\) to \(l\).</p> <p>This implies several things:</p> <ul> <li>The Laplacian matrix is conceptually equivalent as the Laplace operator: (Shuman et al., 2013) provides an intuitive explanation by introducing concepts from discrete calculus.</li> <li>We need to perform eigendecomposition for the Laplacian matrix for this to happen: We need the eigenvectors \({\bf u}_l\).</li> <li>The inner product is now vector multiplication between vectors:</li> </ul> \[\hat{\mathbf{g}}[l] = {\bf u}_l^{T}{\bf g}\] <ul> <li>Or, in vector form:</li> </ul> \[\hat{\mathbf{g}} = U^T \mathbf{g}\] <h2 id="eigendecomposing-sbms">Eigendecomposing SBMs</h2> <p>To see what the eigenvectors of the graph Laplacian is, lets directly compute such vectors by using an intuitive example. Perhaps the best example to illustrate is stochastic block models (SBMs), which is a graph generative model where the user can control simple community structures genertated from the model.</p> <p>Two pieces of information is required for the SBM model to generate graphs with \(c\) number of communities: A vector that defines the number of nodes to be included in each community, and a symmetric matrix indicating the edge probability between (or within) communities.</p> <p>The code below shows one example of an SBM model generated by pytorch geometric, with the help of the networkx package for visualization:</p> <figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="c1"># Generate SBM graph with Pytorch Geometric
+<span class="n">Num_layers</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="n">performance</span><span class="p">:</span> <span class="mf">1.0</span></code></pre></figure>]]></content><author><name></name></author><category term="ChebConv" /><category term="Graph_learning" /><summary type="html"><![CDATA[Introduction]]></summary></entry><entry><title type="html">Dissecting Cora in the Spectral Domain</title><link href="https://jordan7186.github.io/blog/2022/Cora_spectral/" rel="alternate" type="text/html" title="Dissecting Cora in the Spectral Domain" /><published>2022-10-19T00:00:00+00:00</published><updated>2022-10-19T00:00:00+00:00</updated><id>https://jordan7186.github.io/blog/2022/Cora_spectral</id><content type="html" xml:base="https://jordan7186.github.io/blog/2022/Cora_spectral/"><![CDATA[<h1 id="introduction">Introduction</h1>
+
+<p>In graph signal processing (GSP), graph data is analyzed in the Fourier domain. Although Fourier analysis itself is already well-known on other types of data, extending the Fourier transform for analysis on <strong>graph data</strong> is quite interesting and worth diving into.</p>
+
+<p>This post concerns the basic idea of GSP and further investigates its application with the Cora dataset.</p>
+
+<h1 id="notations">Notations</h1>
+
+<p>For ease of description, let us define some notations and assumptions before moving on.</p>
+
+<h2 id="basic-graph-notations">Basic graph notations</h2>
+
+<ul>
+  <li>Let us assume a graph \(G=(V, E)\) is given, where \(V\) is the set of nodes and \(E\).</li>
+  <li>The number of nodes in the graph is \(n\).</li>
+  <li>It makes life simple if we think of each node \(i \in V\) also as natural numbers (\(i = 1, \cdots, n\)).</li>
+  <li>The adjacency matrix is denoted as \(A\), and the degree matrix as \(D = diag(d_1, \cdots, d_n)\) where \(d_i = \sum_{j=1}^n A_{ij}\).</li>
+</ul>
+
+<h2 id="graph-signals">Graph signals</h2>
+
+<ul>
+  <li>For each node \(i \in V\), a single scalar is assigned as the signal of the node. Its basically the same as defining the node feature matrix, where the dimension of the features is one.</li>
+  <li>The graph signal is represented as a \(n\)-dimensional vector \({\bf g} \in \mathbb{R}^{n}\). Making our notations pytorch-like, the signal for node \(i\) is denoted as \({\bf g}[i] \in \mathbb{R}\) (But here \(i\) starts at 1, not zero).</li>
+</ul>
+
+<h1 id="extension-of-fourier-transform-to-graphs">Extension of Fourier transform to graphs</h1>
+
+<h3 id="1d-fourier-transform">1D Fourier transform</h3>
+
+<p>Fourier transforms enables us to view the given data from the original domain (such as time) to the frequency domain. To apply such transformations to graph signals (data defined on graphs), we need to first generalize the Fourier transformation itself. This insight is nicely described in (Shuman et al., 2013), which we will follow also.</p>
+
+<p>The most frequent <del>(no pun intended)</del> equation that you might have encountered when looking up for Fourier transformation would be the following:</p>
+
+\[\hat{f}(\zeta) = \int_{\mathbb{R}} f(t) e^{-2 \pi i \zeta t} dt,\]
+
+<p>where the function \(f\) defined on the (probably) time domain (i.e., \(t\)) is transformed into a function \(\hat{f}\) defined on the frequency domain (i.e., \(\zeta\)). The interpretation of the integral itself is beautifully described by 3Blue1Brown (<a href="https://www.youtube.com/watch?v=spUNpyF58BY">link</a>).</p>
+
+<p>In more general terms, the Fourier transformation can be thought of as the inner product between the original function and the eigenfunctions of the Laplace operator. Concretely,</p>
+
+\[\hat{f}(\zeta) = &lt;f, e^{2\pi i\zeta i}&gt;,\]
+
+<p>and you can see the first equation naturally aligns with the general definition of Fourier transform. Eq. (2) in (Shuman et al., 2013) also shows that \(e^{2\pi i \zeta i}\) is indeed the eigenfunction of the Laplace operator in 1D.</p>
+
+<h3 id="graph-fourier-transform">Graph fourier transform</h3>
+
+<p>This generalized definition provides the way to extend the Fourier transformation to graph data. By reminding that the graph data is a discrete data that are represented as vectors rather than functions, the extension of Fourier transform is now clear : 1) Get the eigen<strong>vectors</strong> of the Laplacian <strong>matrix</strong> 2) Inner product with the original graph signal.</p>
+
+<p>More concretely, the transformed graph signal is described as:</p>
+
+\[\hat{\mathbf{g}}[l] = &lt;{\bf g}, {\bf u}_l&gt;,\]
+
+<p>where \({\bf u}_l\) is the eigvenvector corresponding to the \(l\)-th lowest eigenvalue of the Laplacian matrix (\(l = 1, \cdots, n\)). Notice that the domain has shifted from \(i\) to \(l\).</p>
+
+<p>This implies several things:</p>
+
+<ul>
+  <li>The Laplacian matrix is conceptually equivalent as the Laplace operator: (Shuman et al., 2013) provides an intuitive explanation by introducing concepts from discrete calculus.</li>
+  <li>We need to perform eigendecomposition for the Laplacian matrix for this to happen: We need the eigenvectors \({\bf u}_l\).</li>
+  <li>The inner product is now vector multiplication between vectors:</li>
+</ul>
+
+\[\hat{\mathbf{g}}[l] = {\bf u}_l^{T}{\bf g}\]
+
+<ul>
+  <li>Or, in vector form:</li>
+</ul>
+
+\[\hat{\mathbf{g}} = U^T \mathbf{g}\]
+
+<h2 id="eigendecomposing-sbms">Eigendecomposing SBMs</h2>
+
+<p>To see what the eigenvectors of the graph Laplacian is, lets directly compute such vectors by using an intuitive example. Perhaps the best example to illustrate is stochastic block models (SBMs), which is a graph generative model where the user can control simple community structures genertated from the model.</p>
+
+<p>Two pieces of information is required for the SBM model to generate graphs with \(c\) number of communities: A vector that defines the number of nodes to be included in each community, and a symmetric matrix indicating the edge probability between (or within) communities.</p>
+
+<p>The code below shows one example of an SBM model generated by pytorch geometric, with the help of the networkx package for visualization:</p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="c1"># Generate SBM graph with Pytorch Geometric
 </span><span class="kn">import</span> <span class="n">torch_geometric</span> <span class="k">as</span> <span class="n">pyg</span>
 <span class="kn">from</span> <span class="n">torch_geometric.data</span> <span class="kn">import</span> <span class="n">Data</span>
 <span class="kn">from</span> <span class="n">torch_geometric.utils</span> <span class="kn">import</span> <span class="n">stochastic_blockmodel_graph</span> <span class="k">as</span> <span class="n">sbm</span>
@@ -429,7 +1071,289 @@ Run the actual experiment
 
 <span class="c1"># To visualize, move from torch_geometric.data.Data to networkx.Graph object
 </span><span class="n">sbm_torch</span> <span class="o">=</span> <span class="nf">to_networkx</span><span class="p">(</span><span class="n">sbm_torch</span><span class="p">,</span> <span class="n">to_undirected</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-<span class="n">nx</span><span class="p">.</span><span class="nf">draw</span><span class="p">(</span><span class="n">sbm_torch</span><span class="p">,</span> <span class="n">node_size</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">node_color</span><span class="o">=</span><span class="n">node_color</span><span class="p">)</span></code></pre></figure> <div class="row mt-3"> <div class="col-sm mt-3 mt-md-0"> <figure> <picture> <source class="responsive-img-srcset" media="(max-width: 480px)" srcset="/assets/img/blog2_1-480.webp"/> <source class="responsive-img-srcset" media="(max-width: 800px)" srcset="/assets/img/blog2_1-800.webp"/> <source class="responsive-img-srcset" media="(max-width: 1400px)" srcset="/assets/img/blog2_1-1400.webp"/> <img src="/assets/img/blog2_1.png" class="img-fluid rounded" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();"/> </picture> </figure> </div> </div> <div class="caption"> A graph generated from SBM using the code above. </div> <p>In Figure 1, the probability of an edge existing between different communities (color coded in blue and red, respectively) is set to 0.005, while the probability within the same community is set to 0.2. Note that the edges are independently generated. If we set the probability between different community to zero, graphs such as in Figure 2 will be generated.</p> <p>We will use the following quite dramatic but managable graph for decomposition:</p> <div class="row mt-3"> <div class="col-sm mt-3 mt-md-0"> <figure> <picture> <source class="responsive-img-srcset" media="(max-width: 480px)" srcset="/assets/img/blog2_2-480.webp"/> <source class="responsive-img-srcset" media="(max-width: 800px)" srcset="/assets/img/blog2_2-800.webp"/> <source class="responsive-img-srcset" media="(max-width: 1400px)" srcset="/assets/img/blog2_2-1400.webp"/> <img src="/assets/img/blog2_2.png" class="img-fluid rounded" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();"/> </picture> </figure> </div> </div> <div class="caption"> The graph to be decomposed. It contains 10 nodes in each connected components. </div> <p>The eigendecomposition of the unnormalized graph Laplacian \(L = D-A\) is easilty computed by modern libraries, such as numpy or pytorch. The values of the sorted eigenvalues are as follows:</p> <div class="row mt-3"> <div class="col-sm mt-3 mt-md-0"> <figure> <picture> <source class="responsive-img-srcset" media="(max-width: 480px)" srcset="/assets/img/blog2_3-480.webp"/> <source class="responsive-img-srcset" media="(max-width: 800px)" srcset="/assets/img/blog2_3-800.webp"/> <source class="responsive-img-srcset" media="(max-width: 1400px)" srcset="/assets/img/blog2_3-1400.webp"/> <img src="/assets/img/blog2_3.png" class="img-fluid rounded" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();"/> </picture> </figure> </div> </div> <div class="caption"> Plot of the eigenvalues, sorted in increasing order. </div> <p>We can clearly see that three eigenvalues are at zero, indicating that there are three very distinct community structures (i.e., connected components) within the graph structure. The smallest eigenvalues (frequencies) correspond to number of connected components, since <strong>connected components is the most ‘macro’ view when looking at the graph structure</strong>. This is analogous to the <a href="https://en.wikipedia.org/wiki/Fourier_series#Sine-cosine_form">Fourier series expansion</a> of a periodic function. Roughly speaking, the Fourier series expansion can be thought of re-expressing a function with sine and cosine basis:</p> \[f(x) = a_0 + \sum_{n}^{\infty}(a_n \sin (\omega_nx) + b_n \cos (\omega_nx)),\] <p>and the ‘lowest frequency’ sine and cosines inside the summation have the ‘widest’ valleys (or the ‘macro’ view since they are responsible of describing the large-scale characteristics).</p> <p>We can them anticipate the eigenvalues when we slightly modify the graph (see Figure 4):</p> <div class="row mt-3"> <div class="col-sm mt-3 mt-md-0"> <figure> <picture> <source class="responsive-img-srcset" media="(max-width: 480px)" srcset="/assets/img/blog2_4-480.webp"/> <source class="responsive-img-srcset" media="(max-width: 800px)" srcset="/assets/img/blog2_4-800.webp"/> <source class="responsive-img-srcset" media="(max-width: 1400px)" srcset="/assets/img/blog2_4-1400.webp"/> <img src="/assets/img/blog2_4.png" class="img-fluid rounded" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();"/> </picture> </figure> </div> </div> <div class="caption"> Modified graph, now the whole graph is connected. </div> <div class="row mt-3"> <div class="col-sm mt-3 mt-md-0"> <figure> <picture> <source class="responsive-img-srcset" media="(max-width: 480px)" srcset="/assets/img/blog2_5-480.webp"/> <source class="responsive-img-srcset" media="(max-width: 800px)" srcset="/assets/img/blog2_5-800.webp"/> <source class="responsive-img-srcset" media="(max-width: 1400px)" srcset="/assets/img/blog2_5-1400.webp"/> <img src="/assets/img/blog2_5.png" class="img-fluid rounded" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();"/> </picture> </figure> </div> </div> <div class="caption"> Plot of the sorted eigenvalues for the modified graph. </div> <p>Now, the number of zero eigenvalues in Figure 6 becomes one, since the graph now has one connected component. However we can still see that the second and third lowest values are still quite near zero.</p> <p>It is also worth illustrating the eigenvectors itself. Following conventional notiations, lets say that the Laplacian matrix \(L\) is decomposed into \(L = U \Lambda U^{T}\), where the diagonal matirx \(\Lambda\) contains the (ordered) eigenvalues and \(U\) contains the eigenvectors:</p> \[U = \begin{bmatrix} \vert &amp; &amp;\vert \\ {\bf u}_1 &amp; \cdots &amp; {\bf u}_{n} \\ \vert &amp; &amp;\vert \end{bmatrix}\] <p>Lets straight up visualize \(U\).</p> <div class="row mt-3"> <div class="col-sm mt-3 mt-md-0"> <figure> <picture> <source class="responsive-img-srcset" media="(max-width: 480px)" srcset="/assets/img/blog2_6-480.webp"/> <source class="responsive-img-srcset" media="(max-width: 800px)" srcset="/assets/img/blog2_6-800.webp"/> <source class="responsive-img-srcset" media="(max-width: 1400px)" srcset="/assets/img/blog2_6-1400.webp"/> <img src="/assets/img/blog2_6.png" class="img-fluid rounded" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();"/> </picture> </figure> </div> </div> <div class="caption"> Heatmap visualization of the eigenvectors (also sorted by their corresponding eigenvalues in ascending order). </div> <p>Here, we can see the different modes of the graph signals, which are combined together to form the original graph signals. In the left-most column (\({\bf u}_1\)), the values all have the same values. This eigenvector corresponds to the lowest eigenvalue (which is zero), and the same values indicate the ‘one connected component’ information.</p> <p>However, the eigenvector right next to it (\({\bf u}_2\), corresponding to the second-lowest eigenvalue) still shows the three community structures present in the graph. To be more explicit, lets plot \({\bf u}_1\):</p> <div class="row mt-3"> <div class="col-sm mt-3 mt-md-0"> <figure> <picture> <source class="responsive-img-srcset" media="(max-width: 480px)" srcset="/assets/img/blog2_7-480.webp"/> <source class="responsive-img-srcset" media="(max-width: 800px)" srcset="/assets/img/blog2_7-800.webp"/> <source class="responsive-img-srcset" media="(max-width: 1400px)" srcset="/assets/img/blog2_7-1400.webp"/> <img src="/assets/img/blog2_7.png" class="img-fluid rounded" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();"/> </picture> </figure> </div> </div> <div class="caption"> Direct plot. </div> <p>In short, assuming that the graph has only one connected component, \({\bf u}_1\) encodes the community structure of the graph. This is actually the main idea behind <strong>spectral clustering</strong> (Luxberg, 2007).</p> <h1 id="low-pass-filtering-cora">Low-pass filtering Cora</h1> <p>Regarding graph signal processing and Fourier transform, the paper (NT &amp; Maehara, 2019) introduces a straightforward experiment on the Cora dataset (Yang et al,. 2016) (Specifically, section 3).</p> <h3 id="the-experiment-procedure-in-nt--maehara-2019">The experiment procedure in (NT &amp; Maehara, 2019)</h3> <p>Denoting the feature matrix of Cora as \(X \in \mathbb{R}^{2703 \times 1433}\) and given an index \(k \in [1, 2703]\), this is the experiment procedure:</p> <ol> <li>Compute the Fourier basis \(U\) by eigendecomposing the graph Laplacian.</li> <li>Add Gaussian noise to the feature matrix: \(X \leftarrow X + \mathcal{N}(0, \sigma^2)\)</li> <li>Compute the lowest \(k\)-frequency component: \(X_k \leftarrow U[:k]^T X\)</li> <li>Reconstruct the features: \(\tilde{X}_k = U[:k] X_k\)</li> <li>Train an MLP on \(\tilde{X}_k\) for semi-supervised node classification.</li> </ol> <p>We attempt to reproduce the results and make some discussions and interpretations. In our case, we use the unnormalized graph Laplacian \(L = D-A\) as opposed to the symmetrically normalized version \(L_{norm} = D^{-1/2}AD^{-1/2}\). We also discard step 2 since we are not interested in robustness to noise.</p> <h3 id="in-theory">In theory</h3> <p>In theory, this is the same as <em>low-pass filtering</em> on the feature matrix \(X\). Rewriting in terms of (Shuman et al., 2013) (Look at Section III-A for more details), the procedure is the same as defining a filtering function \({\bf h}\), where in</p> \[{\bf h}(L) = U \begin{bmatrix} h(\lambda_1) &amp; &amp; {\bf 0}\\ &amp; \ddots &amp; \\ {\bf 0} &amp; &amp; h(\lambda_n) \end{bmatrix} U^T,\] <p>the function \(h\) is defind as:</p> \[h(\lambda_i) = \begin{cases} 1 &amp; \text{if}\ i \leq k \\ 0, &amp; \text{otherwise} \end{cases}.\] <p>In summary, the whole process can be described as</p> \[\mathbf{h}(L)X = U \mathbf{h}(\Lambda)U^T X,\] <p>where it transforms the feature matrix \(X\) to the frequency domain (\(U^T X\)), modify the signal by the function \(h\) (\(\mathbf{h}(\Lambda)U^T X\)), and return to the original domain (\(U \mathbf{h}(\Lambda)U^T X\)).</p> <p>Focusing on \(h(\lambda_i)\), it basically cuts off higher frequency signals (remind that the frequencies are determined by the graph structure) where the cutoff is at the \(k\)-th lowest frequency value. It just leaves the Fourier basis that are equal or below the \(k\)-th frequency.</p> <h3 id="our-experiment">Our experiment</h3> <p>This is the experimental result to reprocude (NT &amp; Maehara, 2019), where</p> <ul> <li>A 2 layer MLP was trained with early stopping.</li> <li>Same semi-supervised node classification setting as in (Yang et al., 2016).</li> <li>10 independent trials, plotting the average values in a solid line, alongside the one standard deviation.</li> <li>We plot the results alongside with the performance of an MLP with the same configurations using the original feature matrix \(X\) (pink dotted line).</li> <li>UL stands for unnormalized Laplacian (red line), NL stands for symmetrically normalized Laplacian (yellow line)</li> </ul> <div class="row mt-3"> <div class="col-sm mt-3 mt-md-0"> <figure> <picture> <source class="responsive-img-srcset" media="(max-width: 480px)" srcset="/assets/img/Blog2_8-480.webp"/> <source class="responsive-img-srcset" media="(max-width: 800px)" srcset="/assets/img/Blog2_8-800.webp"/> <source class="responsive-img-srcset" media="(max-width: 1400px)" srcset="/assets/img/Blog2_8-1400.webp"/> <img src="/assets/img/Blog2_8.png" class="img-fluid rounded" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();"/> </picture> </figure> </div> </div> <div class="caption"> Experimental results for the Cora dataset. </div> <p>So, there are several things that are noticeable here:</p> <ol> <li>As expected, the performance is not so great at the extreme low end: There are simply not enough information for the MLP to get going.</li> <li>The <strong>peak performance</strong> happens near \(k\approx400\), even exceeding the case with using the original features. The value \(400\) is still quite a low value, considering that \(k\) can be up to 2703: This implies that the dataset itself benefits from low-frequency structure information. Such tendency aligns with the previous blog post, where assuming that nodes that are connected will probabily have similar labels helps solve node classification on Cora. Remind that locally, low-frequency means that the values between connected nodes does not change much.</li> <li>However, it seems quite weird that the performance does not seem to exactly recover the pink dotted line as we still continue to increase \(k\) near 2703. This issue will probably be linked with the computation error during the eigendecomposition. To show this, we directly calculate the difference bewteen \(X\) and \(U U^T X\): In theory, this is 0. In code, sadly, this is not the case:</li> </ol> <figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="n">torch</span>
+<span class="n">nx</span><span class="p">.</span><span class="nf">draw</span><span class="p">(</span><span class="n">sbm_torch</span><span class="p">,</span> <span class="n">node_size</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">node_color</span><span class="o">=</span><span class="n">node_color</span><span class="p">)</span></code></pre></figure>
+
+<div class="row mt-3">
+    <div class="col-sm mt-3 mt-md-0">
+        <figure>
+
+  <picture>
+    
+    <source class="responsive-img-srcset" media="(max-width: 480px)" srcset="/assets/img/blog2_1-480.webp" />
+    <source class="responsive-img-srcset" media="(max-width: 800px)" srcset="/assets/img/blog2_1-800.webp" />
+    <source class="responsive-img-srcset" media="(max-width: 1400px)" srcset="/assets/img/blog2_1-1400.webp" />
+    
+
+    <!-- Fallback to the original file -->
+    <img src="/assets/img/blog2_1.png" class="img-fluid rounded" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();" />
+  </picture>
+
+</figure>
+
+    </div>
+</div>
+<div class="caption">
+  A graph generated from SBM using the code above. 
+</div>
+
+<p>In Figure 1, the probability of an edge existing between different communities (color coded in blue and red, respectively) is set to 0.005, while the probability within the same community is set to 0.2. Note that the edges are independently generated. If we set the probability between different community to zero, graphs such as in Figure 2 will be generated.</p>
+
+<p>We will use the following quite dramatic but managable graph for decomposition:</p>
+
+<div class="row mt-3">
+    <div class="col-sm mt-3 mt-md-0">
+        <figure>
+
+  <picture>
+    
+    <source class="responsive-img-srcset" media="(max-width: 480px)" srcset="/assets/img/blog2_2-480.webp" />
+    <source class="responsive-img-srcset" media="(max-width: 800px)" srcset="/assets/img/blog2_2-800.webp" />
+    <source class="responsive-img-srcset" media="(max-width: 1400px)" srcset="/assets/img/blog2_2-1400.webp" />
+    
+
+    <!-- Fallback to the original file -->
+    <img src="/assets/img/blog2_2.png" class="img-fluid rounded" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();" />
+  </picture>
+
+</figure>
+
+    </div>
+</div>
+<div class="caption">
+  The graph to be decomposed. It contains 10 nodes in each connected components.
+</div>
+
+<p>The eigendecomposition of the unnormalized graph Laplacian \(L = D-A\) is easilty computed by modern libraries, such as numpy or pytorch. The values of the sorted eigenvalues are as follows:</p>
+
+<div class="row mt-3">
+    <div class="col-sm mt-3 mt-md-0">
+        <figure>
+
+  <picture>
+    
+    <source class="responsive-img-srcset" media="(max-width: 480px)" srcset="/assets/img/blog2_3-480.webp" />
+    <source class="responsive-img-srcset" media="(max-width: 800px)" srcset="/assets/img/blog2_3-800.webp" />
+    <source class="responsive-img-srcset" media="(max-width: 1400px)" srcset="/assets/img/blog2_3-1400.webp" />
+    
+
+    <!-- Fallback to the original file -->
+    <img src="/assets/img/blog2_3.png" class="img-fluid rounded" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();" />
+  </picture>
+
+</figure>
+
+    </div>
+</div>
+<div class="caption">
+  Plot of the eigenvalues, sorted in increasing order.
+</div>
+
+<p>We can clearly see that three eigenvalues are at zero, indicating that there are three very distinct community structures (i.e., connected components) within the graph structure. The smallest eigenvalues (frequencies) correspond to number of connected components, since <strong>connected components is the most ‘macro’ view when looking at the graph structure</strong>. This is analogous to the <a href="https://en.wikipedia.org/wiki/Fourier_series#Sine-cosine_form">Fourier series expansion</a> of a periodic function. Roughly speaking, the Fourier series expansion can be thought of re-expressing a function with sine and cosine basis:</p>
+
+\[f(x) = a_0 + \sum_{n}^{\infty}(a_n \sin (\omega_nx) + b_n \cos (\omega_nx)),\]
+
+<p>and the ‘lowest frequency’ sine and cosines inside the summation have the ‘widest’ valleys (or the ‘macro’ view since they are responsible of describing the large-scale characteristics).</p>
+
+<p>We can them anticipate the eigenvalues when we slightly modify the graph (see Figure 4):</p>
+
+<div class="row mt-3">
+    <div class="col-sm mt-3 mt-md-0">
+        <figure>
+
+  <picture>
+    
+    <source class="responsive-img-srcset" media="(max-width: 480px)" srcset="/assets/img/blog2_4-480.webp" />
+    <source class="responsive-img-srcset" media="(max-width: 800px)" srcset="/assets/img/blog2_4-800.webp" />
+    <source class="responsive-img-srcset" media="(max-width: 1400px)" srcset="/assets/img/blog2_4-1400.webp" />
+    
+
+    <!-- Fallback to the original file -->
+    <img src="/assets/img/blog2_4.png" class="img-fluid rounded" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();" />
+  </picture>
+
+</figure>
+
+    </div>
+</div>
+<div class="caption">
+  Modified graph, now the whole graph is connected.
+</div>
+
+<div class="row mt-3">
+    <div class="col-sm mt-3 mt-md-0">
+        <figure>
+
+  <picture>
+    
+    <source class="responsive-img-srcset" media="(max-width: 480px)" srcset="/assets/img/blog2_5-480.webp" />
+    <source class="responsive-img-srcset" media="(max-width: 800px)" srcset="/assets/img/blog2_5-800.webp" />
+    <source class="responsive-img-srcset" media="(max-width: 1400px)" srcset="/assets/img/blog2_5-1400.webp" />
+    
+
+    <!-- Fallback to the original file -->
+    <img src="/assets/img/blog2_5.png" class="img-fluid rounded" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();" />
+  </picture>
+
+</figure>
+
+    </div>
+</div>
+<div class="caption">
+  Plot of the sorted eigenvalues for the modified graph.
+</div>
+
+<p>Now, the number of zero eigenvalues in Figure 6 becomes one, since the graph now has one connected component. However we can still see that the second and third lowest values are still quite near zero.</p>
+
+<p>It is also worth illustrating the eigenvectors itself. Following conventional notiations, lets say that the Laplacian matrix \(L\) is decomposed into \(L = U \Lambda U^{T}\), where the diagonal matirx \(\Lambda\) contains the (ordered) eigenvalues and \(U\) contains the eigenvectors:</p>
+
+\[U = \begin{bmatrix}
+    \vert &amp; &amp;\vert \\
+    {\bf u}_1 &amp; \cdots  &amp; {\bf u}_{n}   \\
+    \vert &amp; &amp;\vert
+\end{bmatrix}\]
+
+<p>Lets straight up visualize \(U\).</p>
+
+<div class="row mt-3">
+    <div class="col-sm mt-3 mt-md-0">
+        <figure>
+
+  <picture>
+    
+    <source class="responsive-img-srcset" media="(max-width: 480px)" srcset="/assets/img/blog2_6-480.webp" />
+    <source class="responsive-img-srcset" media="(max-width: 800px)" srcset="/assets/img/blog2_6-800.webp" />
+    <source class="responsive-img-srcset" media="(max-width: 1400px)" srcset="/assets/img/blog2_6-1400.webp" />
+    
+
+    <!-- Fallback to the original file -->
+    <img src="/assets/img/blog2_6.png" class="img-fluid rounded" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();" />
+  </picture>
+
+</figure>
+
+    </div>
+</div>
+<div class="caption">
+  Heatmap visualization of the eigenvectors (also sorted by their corresponding eigenvalues in ascending order).
+</div>
+
+<p>Here, we can see the different modes of the graph signals, which are combined together to form the original graph signals. In the left-most column (\({\bf u}_1\)), the values all have the same values. This eigenvector corresponds to the lowest eigenvalue (which is zero), and the same values indicate the ‘one connected component’ information.</p>
+
+<p>However, the eigenvector right next to it (\({\bf u}_2\), corresponding to the second-lowest eigenvalue) still shows the three community structures present in the graph. To be more explicit, lets plot \({\bf u}_1\):</p>
+
+<div class="row mt-3">
+    <div class="col-sm mt-3 mt-md-0">
+        <figure>
+
+  <picture>
+    
+    <source class="responsive-img-srcset" media="(max-width: 480px)" srcset="/assets/img/blog2_7-480.webp" />
+    <source class="responsive-img-srcset" media="(max-width: 800px)" srcset="/assets/img/blog2_7-800.webp" />
+    <source class="responsive-img-srcset" media="(max-width: 1400px)" srcset="/assets/img/blog2_7-1400.webp" />
+    
+
+    <!-- Fallback to the original file -->
+    <img src="/assets/img/blog2_7.png" class="img-fluid rounded" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();" />
+  </picture>
+
+</figure>
+
+    </div>
+</div>
+<div class="caption">
+  Direct plot.
+</div>
+
+<p>In short, assuming that the graph has only one connected component, \({\bf u}_1\) encodes the community structure of the graph. This is actually the main idea behind <strong>spectral clustering</strong> (Luxberg, 2007).</p>
+
+<h1 id="low-pass-filtering-cora">Low-pass filtering Cora</h1>
+
+<p>Regarding graph signal processing and Fourier transform, the paper (NT &amp; Maehara, 2019) introduces a straightforward experiment on the Cora dataset (Yang et al,. 2016) (Specifically, section 3).</p>
+
+<h3 id="the-experiment-procedure-in-nt--maehara-2019">The experiment procedure in (NT &amp; Maehara, 2019)</h3>
+
+<p>Denoting the feature matrix of Cora as \(X \in \mathbb{R}^{2703 \times 1433}\) and given an index \(k \in [1, 2703]\), this is the experiment procedure:</p>
+
+<ol>
+  <li>Compute the Fourier basis \(U\) by eigendecomposing the graph Laplacian.</li>
+  <li>Add Gaussian noise to the feature matrix: \(X \leftarrow X + \mathcal{N}(0, \sigma^2)\)</li>
+  <li>Compute the lowest \(k\)-frequency component: \(X_k \leftarrow U[:k]^T X\)</li>
+  <li>Reconstruct the features: \(\tilde{X}_k = U[:k] X_k\)</li>
+  <li>Train an MLP on \(\tilde{X}_k\) for semi-supervised node classification.</li>
+</ol>
+
+<p>We attempt to reproduce the results and make some discussions and interpretations. In our case, we use the unnormalized graph Laplacian \(L = D-A\) as opposed to the symmetrically normalized version \(L_{norm} = D^{-1/2}AD^{-1/2}\).  We also discard step 2 since we are not interested in robustness to noise.</p>
+
+<h3 id="in-theory">In theory</h3>
+
+<p>In theory, this is the same as <em>low-pass filtering</em> on the feature matrix \(X\). Rewriting in terms of (Shuman et al., 2013) (Look at Section III-A for more details), the procedure is the same as defining a filtering function \({\bf h}\), where in</p>
+
+\[{\bf h}(L) = U
+\begin{bmatrix}
+h(\lambda_1) &amp; &amp; {\bf 0}\\
+ &amp; \ddots &amp;  \\
+{\bf 0} &amp; &amp; h(\lambda_n)
+\end{bmatrix} U^T,\]
+
+<p>the function \(h\) is defind as:</p>
+
+\[h(\lambda_i) =  \begin{cases}
+      1 &amp; \text{if}\ i \leq k \\
+      0, &amp; \text{otherwise}
+    \end{cases}.\]
+
+<p>In summary, the whole process can be described as</p>
+
+\[\mathbf{h}(L)X = U \mathbf{h}(\Lambda)U^T X,\]
+
+<p>where it transforms the feature matrix \(X\) to the frequency domain (\(U^T X\)), modify the signal by the function \(h\) (\(\mathbf{h}(\Lambda)U^T X\)), and return to the original domain (\(U \mathbf{h}(\Lambda)U^T X\)).</p>
+
+<p>Focusing on \(h(\lambda_i)\), it basically cuts off higher frequency signals (remind that the frequencies are determined by the graph structure) where the cutoff is at the \(k\)-th lowest frequency value. It just leaves the Fourier basis that are equal or below the \(k\)-th frequency.</p>
+
+<h3 id="our-experiment">Our experiment</h3>
+
+<p>This is the experimental result to reprocude (NT &amp; Maehara, 2019), where</p>
+
+<ul>
+  <li>A 2 layer MLP was trained with early stopping.</li>
+  <li>Same semi-supervised node classification setting as in (Yang et al., 2016).</li>
+  <li>10 independent trials, plotting the average values in a solid line, alongside the one standard deviation.</li>
+  <li>We plot the results alongside with the performance of an MLP with the same configurations using the original feature matrix \(X\) (pink dotted line).</li>
+  <li>UL stands for unnormalized Laplacian (red line), NL stands for symmetrically normalized Laplacian (yellow line)</li>
+</ul>
+
+<div class="row mt-3">
+    <div class="col-sm mt-3 mt-md-0">
+        <figure>
+
+  <picture>
+    
+    <source class="responsive-img-srcset" media="(max-width: 480px)" srcset="/assets/img/Blog2_8-480.webp" />
+    <source class="responsive-img-srcset" media="(max-width: 800px)" srcset="/assets/img/Blog2_8-800.webp" />
+    <source class="responsive-img-srcset" media="(max-width: 1400px)" srcset="/assets/img/Blog2_8-1400.webp" />
+    
+
+    <!-- Fallback to the original file -->
+    <img src="/assets/img/Blog2_8.png" class="img-fluid rounded" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();" />
+  </picture>
+
+</figure>
+
+    </div>
+</div>
+<div class="caption">
+  Experimental results for the Cora dataset.
+</div>
+
+<p>So, there are several things that are noticeable here:</p>
+
+<ol>
+  <li>As expected, the performance is not so great at the extreme low end: There are simply not enough information for the MLP to get going.</li>
+  <li>The <strong>peak performance</strong> happens near \(k\approx400\), even exceeding the case with using the original features. The value \(400\) is still quite a low value, considering that \(k\) can be up to 2703: This implies that the dataset itself benefits from low-frequency structure information. Such tendency aligns with the previous blog post, where assuming that nodes that are connected will probabily have similar labels helps solve node classification on Cora. Remind that locally, low-frequency means that the values between connected nodes does not change much.</li>
+  <li>However, it seems quite weird that the performance does not seem to exactly recover the pink dotted line as we still continue to increase \(k\) near 2703. This issue will probably be linked with the computation error during the eigendecomposition. To show this, we directly calculate the difference bewteen \(X\) and \(U U^T X\): In theory, this is 0. In code, sadly, this is not the case:</li>
+</ol>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="n">torch</span>
 <span class="kn">from</span> <span class="n">torch.linalg</span> <span class="kn">import</span> <span class="n">eig</span>
 
 <span class="n">L</span><span class="p">,</span> <span class="n">U</span> <span class="o">=</span> <span class="nf">eig</span><span class="p">(</span><span class="n">laplace</span><span class="p">)</span>
@@ -442,7 +1366,139 @@ Run the actual experiment
 
 <span class="n">torch</span><span class="p">.</span><span class="nf">dist</span><span class="p">((</span><span class="n">U_norm</span> <span class="o">@</span> <span class="n">U_norm</span><span class="p">.</span><span class="n">T</span><span class="p">).</span><span class="n">real</span> <span class="o">@</span> <span class="n">data</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">data</span><span class="p">.</span><span class="n">x</span><span class="p">)</span>
 
-<span class="o">&gt;&gt;</span> <span class="nf">tensor</span><span class="p">(</span><span class="mf">101.5464</span><span class="p">)</span></code></pre></figure> <h1 id="conclusion">Conclusion</h1> <p>In this blog post, we have looked at the extension of Fouirer transformation in graph data as the core idea of graph signal processing. The re-representation of the graph in the frequency doman has quite straighforward interpretations, and we have also seen that the basis corresponding to the low frequency directly shows the macro-level structure. Expanding on the interpretation, we reprocude the experimental result in (NT &amp; Maehara, 2019), which directly show that the low-frequency features are vital in the semi-supervised classification for Cora.</p> <h1 id="appendix">Appendix</h1> <p>This is just out of curiosity, how about \(\mathcal{L}X\) instead of \(X\)?</p> <p>Here, the filter function is defined as</p> \[h'(\lambda_i) = \begin{cases} \lambda_i, &amp; \text{if}\ i \leq k \\ 0, &amp; \text{otherwise} \end{cases},\] <p>where in this version the filter actually preserves the frequency of the Laplacian.</p> <p>For brevity, we label different configurations as follows:</p> <table> <thead> <tr> <th> </th> <th>Unnormalized Laplacian</th> <th>Sym. norm. Laplacian</th> </tr> </thead> <tbody> <tr> <td>\(h\)</td> <td>UL (low pass)</td> <td>NL (low pass)</td> </tr> <tr> <td>\(h\)’</td> <td>UL</td> <td>NL</td> </tr> </tbody> </table> <p>The expanded experimental results are as follows:</p> <div class="row mt-3"> <div class="col-sm mt-3 mt-md-0"> <figure> <picture> <source class="responsive-img-srcset" media="(max-width: 480px)" srcset="/assets/img/blog2_9-480.webp"/> <source class="responsive-img-srcset" media="(max-width: 800px)" srcset="/assets/img/blog2_9-800.webp"/> <source class="responsive-img-srcset" media="(max-width: 1400px)" srcset="/assets/img/blog2_9-1400.webp"/> <img src="/assets/img/blog2_9.png" class="img-fluid rounded" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();"/> </picture> </figure> </div> </div> <div class="caption"> Experimental results for the Cora dataset. </div> <ul> <li>Overall, the performance degenerates when we use some form of \(\mathcal{L}X\) instead of \(X\), although the tendency for different \(k\) still remains the same. Considering the unnnormalized Laplaican, \(\mathcal{L} = D-A\), the minus sign in front of the adjacency matrix suggest that we are not actually aggregating the neighbor information; rather, we are emphasizing the difference. It shows that this is a poor representation of \(X\) to solve this task.</li> <li>For the case where we use the symmetrically normalized Laplacian matrix, it is the only configuration that shows that the performace increases as we add more high frequency information (blue line). There can be several explanations for this: <ul> <li>The high frequency information does have performance benefits for some limited cases</li> <li>The computation error from the eigendecomposition is less dominant and is therefore the reason of the performance increase</li> </ul> <p>, which will be an interesting topic for future investigation.</p> </li> </ul>]]></content><author><name></name></author><category term="Spectral"/><category term="Graph_learning"/><summary type="html"><![CDATA[Introduction]]></summary></entry><entry><title type="html">Revisiting Modern Benchmarks for Semi-suparvised Node Classification using Classical Methods</title><link href="https://jordan7186.github.io/blog/2022/Revisiting_SSL/" rel="alternate" type="text/html" title="Revisiting Modern Benchmarks for Semi-suparvised Node Classification using Classical Methods"/><published>2022-10-08T00:00:00+00:00</published><updated>2022-10-08T00:00:00+00:00</updated><id>https://jordan7186.github.io/blog/2022/Revisiting_SSL</id><content type="html" xml:base="https://jordan7186.github.io/blog/2022/Revisiting_SSL/"><![CDATA[<h2 id="introduction">Introduction</h2> <p>Semi-supervised learning (SSL) is one of the most widely studied tasks in machine learning. As the ‘supervised’ part of the name suggessts, data instances are accompanied by its labels, which are sereved as the ground-truth. However, ‘semi’ suggests that not all given instance are learned by supervised learning, but rather a (small) portion of it also have access its ground-truth labels by the model. In the context of graph learning, the task of (semi-supervised) node classification is of the main concern for many research papers. The history to solve this task goes quite a way back, one of which is (Zhou et al., 2003), published back in 2003, before the era of machine learning.</p> <p>In this post, I will revisit this classic method and apply to one of the more modern benchmark datasets, and try to see what analysis can be done to gain some insights.</p> <h2 id="setup--task">Setup &amp; Task</h2> <p>One of the main points to consider beforehand is the fact that [1] assumes that the given dataset is not a graph. Rather, it is a ‘typical’ dataset where we are given a bunch of datapoints that can be described as a set of vectors with a fixed dimension, along with a set of class labels. So one of the main concern of the paper is actually the construction of a graph in which the main algorithm will run on. This graph basically constructs a connection (or an edge in graph terms) based on the pairwise similarity between two datapoints. Therefore, the structure of the resulting graph will highlight how much each data have common features in the context of the enitre dataset; a data with a lot of connections will likely to have information shared across many other datapoints.</p> <p>However, since we are interested in applying the main algorithm in modern <strong>graph benchmark datasets</strong>, we will skip the graph construction part altogether. Instead, we will use the <strong>given graph structure directly</strong>, and lets see how it performs.</p> <h2 id="main-idea-of-the-algorithm">Main Idea of the algorithm</h2> <p>The algorithm itself is first described as an iterative process. Going a bit formal, let us define some terms here:</p> <ul> <li>Denote \(n\) as the number of datapoints (which is equal to the number of <strong>nodes</strong> if we interpret the dataset as a graph).</li> <li>As we deal with graph datasets, we can assume that the adjacency matrix \(A \in \mathcal{R}^{n \times n}\) is given. (Separately constructed as an affinity matrix in [1])</li> <li>Assume each nodes are assigned to one of \(c\) classes, which we express as a one-hot encoded vector.</li> <li>The matrix \(\mathcal{Y} \in \mathcal{R}^{n \times c}\) represents the class information for all nodes in the dataset.</li> <li>The task is to generate a good prediction matrix \(\mathcal{F} \in \mathbb{R}^{n \times c}\), where the actual predicted class is considered as the index of the highest value for each row: \(y_i = \text{arg} \max_{j} \mathcal{F}_{ij}\).</li> </ul> <h3 id="commonly-used-assumption-in-ssl">Commonly used assumption in SSL</h3> <p>The iteration itself encompasses the philosophy of solving the problem of semi-supervised classification. Naturally, we would like to directly utilize the label information of the nodes that are available (Idea 1). Unfortunately, most of the nodes does not have such access. Semi-supervised (node) classification therefore adopts the following assumption about the dataset (task):</p> <aside> 💡 Data points that are close/similar with each other will likely to have the same labels (Idea 2), </aside> <p>which tends to be effective for quite a lot of cases.</p> <h3 id="algorithm">Algorithm</h3> <p>The two ideas (direct loss and similarity assumption) are directly represented in the algorithm, where it can be written as an iterative procedure in the \(t\)-th step:</p> \[\mathcal{F}(t+1) = \alpha A \mathcal{F}(t) + (1-\alpha)\mathcal{Y}.\] <p>Dissecting each term, we can recover each of the ideas directly. Starting from the second term, \((1-\alpha)\mathcal{Y}\) basically just asserts the label information (at least the available ones) into \(\mathcal{F}(t+1)\) (Idea 1). Now the first term, \(\alpha A \mathcal{F}(t)\), basically reuse the sum (scaled down by \((1-\alpha)\)) of what their neighbor says (Idea 2). Here, we implicitly defined the notion of ‘similar’ in the graph case: Connected nodes are close to each other. This assumption also works well for other graph laerning.</p> <h3 id="limit-case">Limit case</h3> <p>The nice thing about this formulation is that, we can directly calculate \(\lim_{t \rightarrow \infty} \mathcal{F}(t)\) analytically. The math itself is also quite straightforward, and the asymptotic result is:</p> \[\lim_{t \rightarrow \infty} \mathcal{F}(t) = (I - \alpha S)^{-1} Y\] <h2 id="application-to-cora">Application to Cora</h2> <p>Cora is perhaps the most used graph benchmark dataset for evaluating on node or edge level tasks (popularized by (Yang et al., 2016). As mentioned, we will only use the graph structure data as the algorithm does not accept node feature as input.</p> <p>We will use <a href="https://pytorch.org/">pytorch</a> and <a href="https://pytorch-geometric.readthedocs.io/">pytorch geometric</a> as our base framework.</p> <figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="n">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="o">&gt;&gt;</span> <span class="nf">tensor</span><span class="p">(</span><span class="mf">101.5464</span><span class="p">)</span></code></pre></figure>
+
+<h1 id="conclusion">Conclusion</h1>
+
+<p>In this blog post, we have looked at the extension of Fouirer transformation in graph data as the core idea of graph signal processing. The re-representation of the graph in the frequency doman has quite straighforward interpretations, and we have also seen that the basis corresponding to the low frequency directly shows the macro-level structure. Expanding on the interpretation, we reprocude the experimental result in (NT &amp; Maehara, 2019), which directly show that the low-frequency features are vital in the semi-supervised classification for Cora.</p>
+
+<h1 id="appendix">Appendix</h1>
+
+<p>This is just out of curiosity, how about \(\mathcal{L}X\) instead of \(X\)?</p>
+
+<p>Here, the filter function is defined as</p>
+
+\[h'(\lambda_i) =  \begin{cases}
+      \lambda_i, &amp; \text{if}\ i \leq k \\
+      0, &amp; \text{otherwise}
+    \end{cases},\]
+
+<p>where in this version the filter actually preserves the frequency of the Laplacian.</p>
+
+<p>For brevity, we label different configurations as follows:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th> </th>
+      <th>Unnormalized Laplacian</th>
+      <th>Sym. norm. Laplacian</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>\(h\)</td>
+      <td>UL (low pass)</td>
+      <td>NL (low pass)</td>
+    </tr>
+    <tr>
+      <td>\(h\)’</td>
+      <td>UL</td>
+      <td>NL</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>The expanded experimental results are as follows:</p>
+
+<div class="row mt-3">
+    <div class="col-sm mt-3 mt-md-0">
+        <figure>
+
+  <picture>
+    
+    <source class="responsive-img-srcset" media="(max-width: 480px)" srcset="/assets/img/blog2_9-480.webp" />
+    <source class="responsive-img-srcset" media="(max-width: 800px)" srcset="/assets/img/blog2_9-800.webp" />
+    <source class="responsive-img-srcset" media="(max-width: 1400px)" srcset="/assets/img/blog2_9-1400.webp" />
+    
+
+    <!-- Fallback to the original file -->
+    <img src="/assets/img/blog2_9.png" class="img-fluid rounded" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();" />
+  </picture>
+
+</figure>
+
+    </div>
+</div>
+<div class="caption">
+  Experimental results for the Cora dataset.
+</div>
+
+<ul>
+  <li>Overall, the performance degenerates when we use some form of \(\mathcal{L}X\) instead of \(X\), although the tendency for different \(k\) still remains the same. Considering the unnnormalized Laplaican, \(\mathcal{L} = D-A\), the minus sign in front of the adjacency matrix suggest that we are not actually aggregating the neighbor information; rather, we are emphasizing the difference. It shows that this is a poor representation of \(X\) to solve this task.</li>
+  <li>For the case where we use the symmetrically normalized Laplacian matrix, it is the only configuration that shows that the performace increases as we add more high frequency information (blue line). There can be several explanations for this:
+    <ul>
+      <li>The high frequency information does have performance benefits for some limited cases</li>
+      <li>The computation error from the eigendecomposition is less dominant and is therefore the reason of the performance increase</li>
+    </ul>
+
+    <p>, which will be an interesting topic for future investigation.</p>
+  </li>
+</ul>]]></content><author><name></name></author><category term="Spectral" /><category term="Graph_learning" /><summary type="html"><![CDATA[Introduction]]></summary></entry><entry><title type="html">Revisiting Modern Benchmarks for Semi-suparvised Node Classification using Classical Methods</title><link href="https://jordan7186.github.io/blog/2022/Revisiting_SSL/" rel="alternate" type="text/html" title="Revisiting Modern Benchmarks for Semi-suparvised Node Classification using Classical Methods" /><published>2022-10-08T00:00:00+00:00</published><updated>2022-10-08T00:00:00+00:00</updated><id>https://jordan7186.github.io/blog/2022/Revisiting_SSL</id><content type="html" xml:base="https://jordan7186.github.io/blog/2022/Revisiting_SSL/"><![CDATA[<h2 id="introduction">Introduction</h2>
+
+<p>Semi-supervised learning (SSL) is one of the most widely studied tasks in machine learning. As the ‘supervised’ part of the name suggessts, data instances are accompanied by its labels, which are sereved as the ground-truth. However, ‘semi’ suggests that not all given instance are learned by supervised learning, but rather a (small) portion of it also have access its ground-truth labels by the model. In the context of graph learning, the task of (semi-supervised) node classification is of the main concern for many research papers. The history to solve this task goes quite a way back, one of which is (Zhou et al., 2003), published back in 2003, before the era of machine learning.</p>
+
+<p>In this post, I will revisit this classic method and apply to one of the more modern benchmark datasets, and try to see what analysis can be done to gain some insights.</p>
+
+<h2 id="setup--task">Setup &amp; Task</h2>
+
+<p>One of the main points to consider beforehand is the fact that [1] assumes that the given dataset is not a graph. Rather, it is a ‘typical’ dataset where we are given a bunch of datapoints that can be described as a set of vectors with a fixed dimension, along with a set of class labels. So one of the main concern of the paper is actually the construction of a graph in which the main algorithm will run on. This graph basically constructs a connection (or an edge in graph terms) based on the pairwise similarity between two datapoints. Therefore, the structure of the resulting graph will highlight how much each data have common features in the context of the enitre dataset; a data with a lot of connections will likely to have information shared across many other datapoints.</p>
+
+<p>However, since we are interested in applying the main algorithm in modern <strong>graph benchmark datasets</strong>, we will skip the graph construction part altogether. Instead, we will use the <strong>given graph structure directly</strong>, and lets see how it performs.</p>
+
+<h2 id="main-idea-of-the-algorithm">Main Idea of the algorithm</h2>
+
+<p>The algorithm itself is first described as an iterative process. Going a bit formal, let us define some terms here:</p>
+
+<ul>
+  <li>Denote \(n\) as the number of datapoints (which is equal to the number of <strong>nodes</strong> if we interpret the dataset as a graph).</li>
+  <li>As we deal with graph datasets, we can assume that the adjacency matrix \(A \in \mathcal{R}^{n \times n}\) is given. (Separately constructed as an affinity matrix in [1])</li>
+  <li>Assume each nodes are assigned to one of \(c\) classes, which we express as a one-hot encoded vector.</li>
+  <li>The matrix \(\mathcal{Y} \in \mathcal{R}^{n \times c}\) represents the class information for all nodes in the dataset.</li>
+  <li>The task is to generate a good prediction matrix \(\mathcal{F} \in \mathbb{R}^{n \times c}\), where the actual predicted class is considered as the index of the highest value for each row: \(y_i = \text{arg} \max_{j} \mathcal{F}_{ij}\).</li>
+</ul>
+
+<h3 id="commonly-used-assumption-in-ssl">Commonly used assumption in SSL</h3>
+
+<p>The iteration itself encompasses the philosophy of solving the problem of semi-supervised classification. Naturally, we would like to directly utilize the label information of the nodes that are available (Idea 1). Unfortunately, most of the nodes does not have such access. Semi-supervised (node) classification therefore adopts the following assumption about the dataset (task):</p>
+
+<aside>
+💡 Data points that are close/similar with each other will likely to have the same labels (Idea 2),
+</aside>
+
+<p>which tends to be effective for quite a lot of cases.</p>
+
+<h3 id="algorithm">Algorithm</h3>
+
+<p>The two ideas (direct loss and similarity assumption) are directly represented in the algorithm, where it can be written as an iterative procedure in the \(t\)-th step:</p>
+
+\[\mathcal{F}(t+1) = \alpha A \mathcal{F}(t) + (1-\alpha)\mathcal{Y}.\]
+
+<p>Dissecting each term, we can recover each of the ideas directly. Starting from the second term, \((1-\alpha)\mathcal{Y}\) basically just asserts the label information (at least the available ones) into \(\mathcal{F}(t+1)\) (Idea 1). Now the first term, \(\alpha A \mathcal{F}(t)\), basically reuse the sum (scaled down by \((1-\alpha)\)) of what their neighbor says (Idea 2).  Here, we implicitly defined the notion of ‘similar’ in the graph case: Connected nodes are close to each other. This assumption also works well for other graph laerning.</p>
+
+<h3 id="limit-case">Limit case</h3>
+
+<p>The nice thing about this formulation is that, we can directly calculate \(\lim_{t \rightarrow \infty} \mathcal{F}(t)\) analytically. The math itself is also quite straightforward, and the asymptotic result is:</p>
+
+\[\lim_{t \rightarrow \infty} \mathcal{F}(t) = (I - \alpha S)^{-1} Y\]
+
+<h2 id="application-to-cora">Application to Cora</h2>
+
+<p>Cora is perhaps the most used graph benchmark dataset for evaluating on node or edge level tasks (popularized by (Yang et al., 2016). As mentioned, we will only use the graph structure data as the algorithm does not accept node feature as input.</p>
+
+<p>We will use <a href="https://pytorch.org/">pytorch</a> and <a href="https://pytorch-geometric.readthedocs.io/">pytorch geometric</a> as our base framework.</p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="n">numpy</span> <span class="k">as</span> <span class="n">np</span>
 <span class="kn">import</span> <span class="n">torch</span>
 <span class="kn">import</span> <span class="n">os</span>
 <span class="kn">from</span> <span class="n">torch.nn</span> <span class="kn">import</span> <span class="n">functional</span> <span class="k">as</span> <span class="n">F</span>
@@ -461,14 +1517,24 @@ Run the actual experiment
 <span class="n">onehot_label</span> <span class="o">=</span> <span class="n">F</span><span class="p">.</span><span class="nf">one_hot</span><span class="p">(</span><span class="n">data</span><span class="p">.</span><span class="n">y</span><span class="p">,</span> <span class="n">num_classes</span><span class="o">=</span><span class="n">dataset</span><span class="p">.</span><span class="n">num_classes</span><span class="p">)</span>
 <span class="n">onehot_label</span> <span class="o">=</span> <span class="n">onehot_label</span><span class="p">.</span><span class="nf">float</span><span class="p">()</span>
 <span class="n">x_train</span> <span class="o">=</span> <span class="n">data</span><span class="p">.</span><span class="n">x</span><span class="p">[</span><span class="n">data</span><span class="p">.</span><span class="n">train_mask</span><span class="p">]</span>  <span class="c1"># feature matrix
-</span><span class="n">y_train</span> <span class="o">=</span> <span class="n">onehot_label</span><span class="p">[</span><span class="n">data</span><span class="p">.</span><span class="n">train_mask</span><span class="p">]</span>  <span class="c1"># node labels</span></code></pre></figure> <h3 id="implementation-1-explicit-iteration">Implementation 1: Explicit iteration</h3> <p>As a first step, we process the data more fit to the algorithm.</p> <figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">A</span> <span class="o">=</span> <span class="nf">to_dense_adj</span><span class="p">(</span><span class="n">data</span><span class="p">.</span><span class="n">edge_index</span><span class="p">).</span><span class="nf">squeeze_</span><span class="p">()</span>
+</span><span class="n">y_train</span> <span class="o">=</span> <span class="n">onehot_label</span><span class="p">[</span><span class="n">data</span><span class="p">.</span><span class="n">train_mask</span><span class="p">]</span>  <span class="c1"># node labels</span></code></pre></figure>
+
+<h3 id="implementation-1-explicit-iteration">Implementation 1: Explicit iteration</h3>
+
+<p>As a first step, we process the data more fit to the algorithm.</p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">A</span> <span class="o">=</span> <span class="nf">to_dense_adj</span><span class="p">(</span><span class="n">data</span><span class="p">.</span><span class="n">edge_index</span><span class="p">).</span><span class="nf">squeeze_</span><span class="p">()</span>
 <span class="n">D_half</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">diag</span><span class="p">((</span><span class="n">A</span><span class="p">.</span><span class="nf">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">).</span><span class="nf">squeeze_</span><span class="p">())</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">2</span><span class="p">),</span> <span class="n">diagonal</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 <span class="n">S</span> <span class="o">=</span> <span class="n">D_half</span> <span class="o">@</span> <span class="n">A</span> <span class="o">@</span> <span class="n">D_half</span> <span class="c1"># Normalization according to the paper
 </span><span class="n">blank</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nc">Tensor</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span>
 <span class="n">Y</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">zeros_like</span><span class="p">(</span><span class="n">onehot_label</span><span class="p">)</span> <span class="c1"># This is the actual data
 </span><span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="n">onehot_label</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
     <span class="k">if</span> <span class="n">data</span><span class="p">.</span><span class="n">train_mask</span><span class="p">[</span><span class="n">row</span><span class="p">]:</span>
-        <span class="n">Y</span><span class="p">[</span><span class="n">row</span><span class="p">]</span> <span class="o">=</span> <span class="n">onehot_label</span><span class="p">[</span><span class="n">row</span><span class="p">]</span> <span class="c1"># Masking is needed to ensure only using training data</span></code></pre></figure> <p>The implementation can be straightforwardly done by following the paper:</p> <figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="c1"># Custom function to measure the accuracy
+        <span class="n">Y</span><span class="p">[</span><span class="n">row</span><span class="p">]</span> <span class="o">=</span> <span class="n">onehot_label</span><span class="p">[</span><span class="n">row</span><span class="p">]</span> <span class="c1"># Masking is needed to ensure only using training data</span></code></pre></figure>
+
+<p>The implementation can be straightforwardly done by following the paper:</p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="c1"># Custom function to measure the accuracy
 </span><span class="k">def</span> <span class="nf">calculate_accuracy</span><span class="p">(</span><span class="n">raw_prediction</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
     <span class="n">indexed_prediction</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">argmax</span><span class="p">(</span><span class="n">raw_prediction</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">indexed_target</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">argmax</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="n">target</span><span class="p">.</span><span class="nf">dim</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">target</span>
@@ -505,7 +1571,47 @@ Run the actual experiment
     <span class="n">tot_iteration</span><span class="o">=</span><span class="n">tot_iteration</span><span class="p">,</span>
     <span class="n">target</span><span class="o">=</span><span class="n">data</span><span class="p">.</span><span class="n">y</span><span class="p">,</span>
     <span class="n">mask</span><span class="o">=~</span><span class="n">data</span><span class="p">.</span><span class="n">train_mask</span><span class="p">,</span>
-<span class="p">)</span></code></pre></figure> <p>Here, the performance is measured by accuracy (for the test nodes of course).</p> <p>Plotting all experiment sessions in which we perform experiments with different values of alpha:</p> <div class="row mt-3"> <div class="col-sm mt-3 mt-md-0"> <figure> <picture> <source class="responsive-img-srcset" media="(max-width: 480px)" srcset="/assets/img/blog1_1-480.webp"/> <source class="responsive-img-srcset" media="(max-width: 800px)" srcset="/assets/img/blog1_1-800.webp"/> <source class="responsive-img-srcset" media="(max-width: 1400px)" srcset="/assets/img/blog1_1-1400.webp"/> <img src="/assets/img/blog1_1.jpg" class="img-fluid rounded z-depth-1" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();"/> </picture> </figure> </div> </div> <div class="caption"> Plot of performance vs. iteration, while varying the value of alpha. </div> <p>According to this result, there are some interesting characteristics that we can observe:</p> <ul> <li>The iteration converges quite fase, and we need ~10 iterations to achieve performance near convergence. We will see this more directly in the next experiment.</li> <li>The effect of alpha is quite consistent accros all values: As alpha increases, the model achievec higher performance. The interpretation of this effect is also strightforward: The neighbor information is quite helpful for solving node classification task in Cora, and the given graph structure is nicely aligned with the ‘closeness’ that we discussed earlier. We will also see this effect again in the next experiment.</li> </ul> <h2 id="implementation-2-analytic-limit-solution">Implementation 2: Analytic limit solution</h2> <p>Now, we will implement the solution by taking the iteration \(t\) to \(\infty\). This is even more straightfoward:</p> <figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="c1"># Direct calculation of limit solution
+<span class="p">)</span></code></pre></figure>
+
+<p>Here, the performance is measured by accuracy (for the test nodes of course).</p>
+
+<p>Plotting all experiment sessions in which we perform experiments with different values of alpha:</p>
+
+<div class="row mt-3">
+    <div class="col-sm mt-3 mt-md-0">
+        <figure>
+
+  <picture>
+    
+    <source class="responsive-img-srcset" media="(max-width: 480px)" srcset="/assets/img/blog1_1-480.webp" />
+    <source class="responsive-img-srcset" media="(max-width: 800px)" srcset="/assets/img/blog1_1-800.webp" />
+    <source class="responsive-img-srcset" media="(max-width: 1400px)" srcset="/assets/img/blog1_1-1400.webp" />
+    
+
+    <!-- Fallback to the original file -->
+    <img src="/assets/img/blog1_1.jpg" class="img-fluid rounded z-depth-1" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();" />
+  </picture>
+
+</figure>
+
+    </div>
+</div>
+<div class="caption">
+  Plot of performance vs. iteration, while varying the value of alpha.
+</div>
+
+<p>According to this result, there are some interesting characteristics that we can observe:</p>
+
+<ul>
+  <li>The iteration converges quite fase, and we need ~10 iterations to achieve performance near convergence. We will see this more directly in the next experiment.</li>
+  <li>The effect of alpha is quite consistent accros all values: As alpha increases, the model achievec higher performance. The interpretation of this effect is also strightforward: The neighbor information is quite helpful for solving node classification task in Cora, and the given graph structure is nicely aligned with the ‘closeness’ that we discussed earlier. We will also see this effect again in the next experiment.</li>
+</ul>
+
+<h2 id="implementation-2-analytic-limit-solution">Implementation 2: Analytic limit solution</h2>
+
+<p>Now, we will implement the solution by taking the iteration \(t\) to \(\infty\). This is even more straightfoward:</p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="c1"># Direct calculation of limit solution
 </span><span class="k">def</span> <span class="nf">get_prediction_limit</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">alpha</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="p">.</span><span class="n">Tensor</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">torch</span><span class="p">.</span><span class="nf">inverse</span><span class="p">(</span><span class="n">torch</span><span class="p">.</span><span class="nf">eye</span><span class="p">(</span><span class="n">W</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">-</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">S</span><span class="p">)</span> <span class="o">@</span> <span class="n">Y</span>
 
@@ -522,4 +1628,67 @@ Run the actual experiment
     <span class="n">result</span> <span class="o">=</span> <span class="nf">perform_experiment_limit</span><span class="p">(</span>
         <span class="n">S</span><span class="o">=</span><span class="n">S</span><span class="p">,</span> <span class="n">Y</span><span class="o">=</span><span class="n">Y</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">data</span><span class="p">.</span><span class="n">y</span><span class="p">,</span> <span class="n">mask</span><span class="o">=~</span><span class="n">data</span><span class="p">.</span><span class="n">train_mask</span>
     <span class="p">)</span>
-    <span class="n">performace_list_limit</span><span class="p">.</span><span class="nf">append</span><span class="p">(</span><span class="n">result</span><span class="p">)</span></code></pre></figure> <p>Again, plotting all results of the limit solution version as a plot results in:</p> <div class="row mt-3"> <div class="col-sm mt-3 mt-md-0"> <figure> <picture> <source class="responsive-img-srcset" media="(max-width: 480px)" srcset="/assets/img/blog1_2-480.webp"/> <source class="responsive-img-srcset" media="(max-width: 800px)" srcset="/assets/img/blog1_2-800.webp"/> <source class="responsive-img-srcset" media="(max-width: 1400px)" srcset="/assets/img/blog1_2-1400.webp"/> <img src="/assets/img/blog1_2.png" class="img-fluid rounded z-depth-1" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();"/> </picture> </figure> </div> </div> <div class="caption"> Plot of performance against different values of alpha. The performane of MLP is also shown as the dotted line. </div> <p>From this plot, we also observe some characteristics:</p> <ul> <li>The effect of alpha is consisent with that of Figure 1.</li> <li>The plot also shows the performance of only using the feature information of Cora by training a two-layer MLP model. Although the performance is not that bad (considering only using a part of the model + simple model), (Zhou et al., 2003) still outperforms. This implies that the neighbor information is more vital than the node feature information.</li> </ul> <p>Additionally, we can plot the asymtotic behavior of the iteative algorithm:</p> <div class="row mt-3"> <div class="col-sm mt-3 mt-md-0"> <figure> <picture> <source class="responsive-img-srcset" media="(max-width: 480px)" srcset="/assets/img/blog1_3-480.webp"/> <source class="responsive-img-srcset" media="(max-width: 800px)" srcset="/assets/img/blog1_3-800.webp"/> <source class="responsive-img-srcset" media="(max-width: 1400px)" srcset="/assets/img/blog1_3-1400.webp"/> <img src="/assets/img/blog1_3.png" class="img-fluid rounded z-depth-1" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();"/> </picture> </figure> </div> </div> <div class="caption"> Plot of the performance vs. iteration, compared between the iterative solution and the analytic in the limit. </div> <p>As mentioned, the iteration converges quite fast, and achieves the optimal performance near ~10 iterations. However, we need furhter experimental evaluations to see whether this fast convergence is due to the dataset or the algorithm.</p> <h2 id="conclusion">Conclusion</h2> <p>In this post, we have revisited the task of semi-supervised node classification. The frequently used benchmark dataset for modern graph learning models, Cora, was tested with a more classical (but insightful) matrix iterative method. Although the algorithm only utilizes the graph information and does not use node feature information, we have seen that the neighbor defined as the graph structure is more critical in soving the task. Perhaps extending to other datasets might reveal to what extent each parts of the dataset (feature vs. structure) affects the performace.</p>]]></content><author><name></name></author><category term="ClassicalMethods"/><category term="Graph_learning"/><summary type="html"><![CDATA[Introduction]]></summary></entry></feed>
+    <span class="n">performace_list_limit</span><span class="p">.</span><span class="nf">append</span><span class="p">(</span><span class="n">result</span><span class="p">)</span></code></pre></figure>
+
+<p>Again, plotting all results of the limit solution version as a plot results in:</p>
+
+<div class="row mt-3">
+    <div class="col-sm mt-3 mt-md-0">
+        <figure>
+
+  <picture>
+    
+    <source class="responsive-img-srcset" media="(max-width: 480px)" srcset="/assets/img/blog1_2-480.webp" />
+    <source class="responsive-img-srcset" media="(max-width: 800px)" srcset="/assets/img/blog1_2-800.webp" />
+    <source class="responsive-img-srcset" media="(max-width: 1400px)" srcset="/assets/img/blog1_2-1400.webp" />
+    
+
+    <!-- Fallback to the original file -->
+    <img src="/assets/img/blog1_2.png" class="img-fluid rounded z-depth-1" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();" />
+  </picture>
+
+</figure>
+
+    </div>
+</div>
+<div class="caption">
+  Plot of performance against different values of alpha. The performane of MLP is also shown as the dotted line.
+</div>
+
+<p>From this plot, we also observe some characteristics:</p>
+
+<ul>
+  <li>The effect of alpha is consisent with that of Figure 1.</li>
+  <li>The plot also shows the performance of only using the feature information of Cora by training a two-layer MLP model. Although the performance is not that bad (considering only using a part of the model + simple model), (Zhou et al., 2003) still outperforms. This implies that the neighbor information is more vital than the node feature information.</li>
+</ul>
+
+<p>Additionally, we can plot the asymtotic behavior of the iteative algorithm:</p>
+
+<div class="row mt-3">
+    <div class="col-sm mt-3 mt-md-0">
+        <figure>
+
+  <picture>
+    
+    <source class="responsive-img-srcset" media="(max-width: 480px)" srcset="/assets/img/blog1_3-480.webp" />
+    <source class="responsive-img-srcset" media="(max-width: 800px)" srcset="/assets/img/blog1_3-800.webp" />
+    <source class="responsive-img-srcset" media="(max-width: 1400px)" srcset="/assets/img/blog1_3-1400.webp" />
+    
+
+    <!-- Fallback to the original file -->
+    <img src="/assets/img/blog1_3.png" class="img-fluid rounded z-depth-1" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();" />
+  </picture>
+
+</figure>
+
+    </div>
+</div>
+<div class="caption">
+  Plot of the performance vs. iteration, compared between the iterative solution and the analytic in the limit.
+</div>
+
+<p>As mentioned, the iteration converges quite fast, and achieves the optimal performance near ~10 iterations. However, we need furhter experimental evaluations to see whether this fast convergence is due to the dataset or the algorithm.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>In this post, we have revisited the task of semi-supervised node classification. The frequently used benchmark dataset for modern graph learning models, Cora, was tested with a more classical (but insightful) matrix iterative method. Although the algorithm only utilizes the graph information and does not use node feature information, we have seen that the neighbor defined as the graph structure is more critical in soving the task. Perhaps extending to other datasets might reveal to what extent each parts of the dataset (feature vs. structure) affects the performace.</p>]]></content><author><name></name></author><category term="ClassicalMethods" /><category term="Graph_learning" /><summary type="html"><![CDATA[Introduction]]></summary></entry></feed>
