@@ -17,18 +17,12 @@ latest_posts: true  # includes a list of the newest posts
 social: false # includes social icons at the bottom of the page
 ---
 
-Hello! I am a Ph.D candidate in [MIDaS Lab](https://sites.google.com/site/midasyonsei) led by *Prof. Won-Yong Shin*, [Dept. Computer Science & Engineering](https://cse.yonsei.ac.kr/cse/index.do) in Yonsei University, South Korea. Before joining MIDaS, I graduated from Yonsei University in Feb. 2019 as a physics major. 
+Hello! I am a research scientist working in LG AI Research, involved in solving various real-world problems using machine learning. I recently completed by Ph.D this year in [MIDaS Lab](https://sites.google.com/site/midasyonsei) led by *Prof. Won-Yong Shin*, [Dept. Computer Science & Engineering](https://cse.yonsei.ac.kr/cse/index.do) in Yonsei University, South Korea.
 
-My primary interest is to find elegant and simple solutions to interesting and important problems on **graph data** and **graph neural networks (GNNs).** More specifically, my main research topics have been focused primarily on…
+During my Ph.D, my primary interest was to find elegant and simple solutions to interesting and important problems on **graph data** and **graph neural networks (GNNs).** More specifically, my main research topics have been focused primarily on…
 
 - **Explainability** in graph neural networks
 - **Efficient** graph learning
-
-And my current research focuses on...
-
-- Exploiting explanations from graph learning modules to improve the underlying data
-- Diving into the evaluation protocols for explainability, especially using attention weights
-- Fusion of graph neural networks with large language models
 
 I also have research experiences in…
 
