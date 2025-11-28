@@ -21,30 +21,20 @@ latest_posts: false
 social: false
 ---
 
-Hello! I am a research scientist working in LG AI Research, involved in solving various real-world problems using machine learning. I recently completed by Ph.D this year in [MIDaS Lab](https://sites.google.com/site/midasyonsei) led by *Prof. Won-Yong Shin*, [Dept. Computer Science & Engineering](https://cse.yonsei.ac.kr/cse/index.do) in Yonsei University, South Korea.
+Hello! I am a research scientist working at the Material intelligence lab in [**LG AI Research**](https://lgresearch.ai/), solving various real-world problems using machine learning, including building an AI-powered autonomous lab system. Before joining LG AI Research, I completed my Ph.D at the [MIDaS Lab](https://sites.google.com/site/midasyonsei) led by *Prof. Won-Yong Shin*, [Dept. Computer Science & Engineering](https://cse.yonsei.ac.kr/cse/index.do) in Yonsei University, Seoul, South Korea.
 
-During my Ph.D, my primary interest was to find elegant and simple solutions to interesting and important problems on **graph data** and **graph neural networks (GNNs).** More specifically, my main research topics have been focused primarily on…
+During my Ph.D, my primary interest was to find elegant and simple solutions to interesting and important problems on **graph data** and **graph neural networks (GNNs).** More specifically, my main research topics have been focused primarily on **Explainability** in graph neural networks as well as **Efficient** graph learning. I am still interested in these topics, and I am currently exploring how to apply explainable and efficient graph learning techniques to real-world applications in the material science domain.
 
-- **Explainability** in graph neural networks
-- **Efficient** graph learning
+I also have published in conferences like AAAI, IJCAI, SIGIR, LoG, and journals like PAMI, PlosOne, as well as serving as a reviewer for top AI/ML conferences such as NeurIPS, AAAI, IJCAI, KDD, WWW, and so on.
 
-I also have research experiences in…
+I also have some side research interests, including:
 
-- Time-series with INR
-- Graph representation learning
-- Explainable healthcare
-- Recommendation systems
-
-...which are published in conferences like AAAI, IJCAI, SIGIR, LoG, and journals like PAMI, PlosOne, and so on.
-
-I am always interested in reading about for other research fields, for example in...
-
-- Mechanistic Interpretability: I personally think that this is the future of XAI research. I just started to pick up some papers on this topic and I am trying to understand the concept of mechanistic interpretability. As a means to learn more about this topic, I am currently translating several important articles on mechanistic interpretability into Korean. **Check out this [Gitbook](https://lesskorrect.gitbook.io/mechanistic-interpretability) if you are interested!**
-- Causal Inference: With the help of Brady Neal's [Introduction to Causal Inference](https://www.bradyneal.com/causal-inference-course), I am trying to understand the concept of causality to understand how it can impact the explainability of machine learning models.
+- **Mechanistic Interpretability**: I personally think that this is the future of XAI research. I just started to pick up some papers on this topic and I am trying to understand the concept of mechanistic interpretability. As a means to learn more about this topic, I am currently translating several important articles on mechanistic interpretability into Korean. **Check out this [Gitbook](https://lesskorrect.gitbook.io/mechanistic-interpretability) if you are interested!**
+- **Causal Inference**: With the help of Brady Neal's [Introduction to Causal Inference](https://www.bradyneal.com/causal-inference-course), I am trying to understand the concept of causality to understand how it can impact the explainability of machine learning models.
 
 I am always open to new ideas and collaborations, so feel free to reach out to me!
 
 Here is my formal [CV](/assets/pdf/CV.pdf) :)
 
-And I also have a <a href="https://yongminshin.thesimple.ink/">personal blog</a>. Check it out!
+And I also have a <a href="https://yongminshin.thesimple.ink/">personal blog</a>, though it is under some renovation at the moment. Nevertheless, please check it out!
 
