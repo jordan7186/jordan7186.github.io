@@ -125,23 +125,23 @@ The blog supports several advanced features for research-level writing. See the 
 Wrap figures in the `figure-numbered` class for automatic numbering:
 
 ```html
-<figure class="figure-numbered">
+{% raw %}<figure class="figure-numbered">
 {% include figure.html path="/assets/img/your-image.jpg" class="img-fluid rounded z-depth-1" %}
 <figcaption>Your caption text here.</figcaption>
-</figure>
+</figure>{% endraw %}
 ```
 
 Or for more complex layouts:
 
 ```html
-<figure class="figure-numbered">
+{% raw %}<figure class="figure-numbered">
 <div class="row mt-3">
     <div class="col-sm mt-3 mt-md-0">
         {% include figure.html path="/assets/img/your-image.jpg" class="img-fluid rounded z-depth-1" %}
     </div>
 </div>
 <figcaption>Your caption text here.</figcaption>
-</figure>
+</figure>{% endraw %}
 ```
 
 Figures are numbered automatically (Figure 1, Figure 2, etc.) within each post. Note: Use `<figcaption>` instead of `<div class="caption">` for proper numbering.
