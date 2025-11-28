@@ -1,18 +1,35 @@
 ---
 layout: post 
 title: Dissecting Cora in the Spectral Domain 
-description: 
+description: Graph signal processing and Fourier analysis on the Cora dataset
 tags: Graph_learning  
 giscus_comments: true 
 date: 2022-10-19
 featured: true
 categories: Spectral
-related_publications: Yang2016planetoid, Shuman2013graphspectral, Luxburg2007spectralclustering, NT2019lowpass
-toc:
-  sidebar: left
-# Below is an example of injecting additional post-specific styles.
-# If you use this post as a template, delete this _styles block.
-
+series: graph-spectral
+series_part: 1
+references:
+  - authors: "Yang, Z., Cohen, W., & Salakhutdinov, R."
+    year: 2016
+    title: "Revisiting Semi-Supervised Learning with Graph Embeddings"
+    venue: "ICML"
+    url: "https://arxiv.org/abs/1603.08861"
+  - authors: "Shuman, D. I., Narang, S. K., Frossard, P., Ortega, A., & Vandergheynst, P."
+    year: 2013
+    title: "The Emerging Field of Signal Processing on Graphs"
+    venue: "IEEE Signal Processing Magazine"
+    url: "https://arxiv.org/abs/1211.0053"
+  - authors: "Von Luxburg, U."
+    year: 2007
+    title: "A Tutorial on Spectral Clustering"
+    venue: "Statistics and Computing"
+    url: "https://arxiv.org/abs/0711.0189"
+  - authors: "NT, H., & Maehara, T."
+    year: 2019
+    title: "Revisiting Graph Neural Networks: All We Have is Low-Pass Filters"
+    venue: "arXiv preprint"
+    url: "https://arxiv.org/abs/1905.09550"
 ---
 
 # Introduction
@@ -41,7 +58,7 @@ For ease of description, let us define some notations and assumptions before mov
 
 ### 1D Fourier transform
 
-Fourier transforms enables us to view the given data from the original domain (such as time) to the frequency domain. To apply such transformations to graph signals (data defined on graphs), we need to first generalize the Fourier transformation itself. This insight is nicely described in (Shuman et al., 2013), which we will follow also.
+Fourier transforms enables us to view the given data from the original domain (such as time) to the frequency domain. To apply such transformations to graph signals (data defined on graphs), we need to first generalize the Fourier transformation itself. This insight is nicely described in <span class="citation" data-preview="Shuman, D. I., Narang, S. K., Frossard, P., Ortega, A., & Vandergheynst, P. (2013). The Emerging Field of Signal Processing on Graphs. IEEE Signal Processing Magazine.">(Shuman et al., 2013)</span>, which we will follow also.
 
 The most frequent ~~(no pun intended)~~ equation that you might have encountered when looking up for Fourier transformation would be the following:
 
@@ -119,40 +136,40 @@ nx.draw(sbm_torch, node_size=50, node_color=node_color)
 {% endhighlight %}
 
 
-<div class="row mt-3">
-    <div class="col-sm mt-3 mt-md-0">
-        {% include figure.html path="/assets/img/blog2_1.png" class="img-fluid rounded" %}
+<figure class="figure-numbered">
+    <div class="row mt-3">
+        <div class="col-sm mt-3 mt-md-0">
+            {% include figure.html path="/assets/img/blog2_1.png" class="img-fluid rounded" %}
+        </div>
     </div>
-</div>
-<div class="caption">
-  A graph generated from SBM using the code above. 
-</div>
+    <figcaption>A graph generated from SBM using the code above.</figcaption>
+</figure>
 
 In Figure 1, the probability of an edge existing between different communities (color coded in blue and red, respectively) is set to 0.005, while the probability within the same community is set to 0.2. Note that the edges are independently generated. If we set the probability between different community to zero, graphs such as in Figure 2 will be generated.
 
 We will use the following quite dramatic but managable graph for decomposition:
 
 
-<div class="row mt-3">
-    <div class="col-sm mt-3 mt-md-0">
-        {% include figure.html path="/assets/img/blog2_2.png" class="img-fluid rounded" %}
+<figure class="figure-numbered">
+    <div class="row mt-3">
+        <div class="col-sm mt-3 mt-md-0">
+            {% include figure.html path="/assets/img/blog2_2.png" class="img-fluid rounded" %}
+        </div>
     </div>
-</div>
-<div class="caption">
-  The graph to be decomposed. It contains 10 nodes in each connected components.
-</div>
+    <figcaption>The graph to be decomposed. It contains 10 nodes in each connected components.</figcaption>
+</figure>
 
 The eigendecomposition of the unnormalized graph Laplacian $$L = D-A$$ is easilty computed by modern libraries, such as numpy or pytorch. The values of the sorted eigenvalues are as follows:
 
 
-<div class="row mt-3">
-    <div class="col-sm mt-3 mt-md-0">
-        {% include figure.html path="/assets/img/blog2_3.png" class="img-fluid rounded" %}
+<figure class="figure-numbered">
+    <div class="row mt-3">
+        <div class="col-sm mt-3 mt-md-0">
+            {% include figure.html path="/assets/img/blog2_3.png" class="img-fluid rounded" %}
+        </div>
     </div>
-</div>
-<div class="caption">
-  Plot of the eigenvalues, sorted in increasing order.
-</div>
+    <figcaption>Plot of the eigenvalues, sorted in increasing order.</figcaption>
+</figure>
 
 We can clearly see that three eigenvalues are at zero, indicating that there are three very distinct community structures (i.e., connected components) within the graph structure. The smallest eigenvalues (frequencies) correspond to number of connected components, since **connected components is the most ‘macro’ view when looking at the graph structure**. This is analogous to the [Fourier series expansion](https://en.wikipedia.org/wiki/Fourier_series#Sine-cosine_form) of a periodic function. Roughly speaking, the Fourier series expansion can be thought of re-expressing a function with sine and cosine basis:
 
@@ -165,23 +182,23 @@ and the ‘lowest frequency’ sine and cosines inside the summation have the �
 We can them anticipate the eigenvalues when we slightly modify the graph (see Figure 4):
 
 
-<div class="row mt-3">
-    <div class="col-sm mt-3 mt-md-0">
-        {% include figure.html path="/assets/img/blog2_4.png" class="img-fluid rounded" %}
+<figure class="figure-numbered">
+    <div class="row mt-3">
+        <div class="col-sm mt-3 mt-md-0">
+            {% include figure.html path="/assets/img/blog2_4.png" class="img-fluid rounded" %}
+        </div>
     </div>
-</div>
-<div class="caption">
-  Modified graph, now the whole graph is connected.
-</div>
+    <figcaption>Modified graph, now the whole graph is connected.</figcaption>
+</figure>
 
-<div class="row mt-3">
-    <div class="col-sm mt-3 mt-md-0">
-        {% include figure.html path="/assets/img/blog2_5.png" class="img-fluid rounded" %}
+<figure class="figure-numbered">
+    <div class="row mt-3">
+        <div class="col-sm mt-3 mt-md-0">
+            {% include figure.html path="/assets/img/blog2_5.png" class="img-fluid rounded" %}
+        </div>
     </div>
-</div>
-<div class="caption">
-  Plot of the sorted eigenvalues for the modified graph.
-</div>
+    <figcaption>Plot of the sorted eigenvalues for the modified graph.</figcaption>
+</figure>
 
 Now, the number of zero eigenvalues in Figure 6 becomes one, since the graph now has one connected component. However we can still see that the second and third lowest values are still quite near zero.
 
@@ -197,33 +214,33 @@ $$
 
 Lets straight up visualize $$U$$.
 
-<div class="row mt-3">
-    <div class="col-sm mt-3 mt-md-0">
-        {% include figure.html path="/assets/img/blog2_6.png" class="img-fluid rounded" %}
+<figure class="figure-numbered">
+    <div class="row mt-3">
+        <div class="col-sm mt-3 mt-md-0">
+            {% include figure.html path="/assets/img/blog2_6.png" class="img-fluid rounded" %}
+        </div>
     </div>
-</div>
-<div class="caption">
-  Heatmap visualization of the eigenvectors (also sorted by their corresponding eigenvalues in ascending order).
-</div>
+    <figcaption>Heatmap visualization of the eigenvectors (also sorted by their corresponding eigenvalues in ascending order).</figcaption>
+</figure>
 
 Here, we can see the different modes of the graph signals, which are combined together to form the original graph signals. In the left-most column ($${\bf u}_1$$), the values all have the same values. This eigenvector corresponds to the lowest eigenvalue (which is zero), and the same values indicate the ‘one connected component’ information.
 
 However, the eigenvector right next to it ($${\bf u}_2$$, corresponding to the second-lowest eigenvalue) still shows the three community structures present in the graph. To be more explicit, lets plot $${\bf u}_1$$:
 
-<div class="row mt-3">
-    <div class="col-sm mt-3 mt-md-0">
-        {% include figure.html path="/assets/img/blog2_7.png" class="img-fluid rounded" %}
+<figure class="figure-numbered">
+    <div class="row mt-3">
+        <div class="col-sm mt-3 mt-md-0">
+            {% include figure.html path="/assets/img/blog2_7.png" class="img-fluid rounded" %}
+        </div>
     </div>
-</div>
-<div class="caption">
-  Direct plot.
-</div>
+    <figcaption>Direct plot.</figcaption>
+</figure>
 
 In short, assuming that the graph has only one connected component, $${\bf u}_1$$ encodes the community structure of the graph. This is actually the main idea behind **spectral clustering** (Luxberg, 2007).
 
 # Low-pass filtering Cora
 
-Regarding graph signal processing and Fourier transform, the paper (NT & Maehara, 2019) introduces a straightforward experiment on the Cora dataset (Yang et al,. 2016) (Specifically, section 3). 
+Regarding graph signal processing and Fourier transform, the paper <span class="citation" data-preview="NT, H., & Maehara, T. (2019). Revisiting Graph Neural Networks: All We Have is Low-Pass Filters. arXiv preprint.">(NT & Maehara, 2019)</span> introduces a straightforward experiment on the Cora dataset <span class="citation" data-preview="Yang, Z., Cohen, W., & Salakhutdinov, R. (2016). Revisiting Semi-Supervised Learning with Graph Embeddings. ICML.">(Yang et al., 2016)</span> (Specifically, section 3). 
 
 ### The experiment procedure in (NT & Maehara, 2019)
 
@@ -280,14 +297,14 @@ This is the experimental result to reprocude (NT & Maehara, 2019), where
 - UL stands for unnormalized Laplacian (red line), NL stands for symmetrically normalized Laplacian (yellow line)
 
 
-<div class="row mt-3">
-    <div class="col-sm mt-3 mt-md-0">
-        {% include figure.html path="/assets/img/Blog2_8.png" class="img-fluid rounded" %}
+<figure class="figure-numbered">
+    <div class="row mt-3">
+        <div class="col-sm mt-3 mt-md-0">
+            {% include figure.html path="/assets/img/Blog2_8.png" class="img-fluid rounded" %}
+        </div>
     </div>
-</div>
-<div class="caption">
-  Experimental results for the Cora dataset.
-</div>
+    <figcaption>Experimental results for the Cora dataset.</figcaption>
+</figure>
 
 So, there are several things that are noticeable here:
 
@@ -341,14 +358,14 @@ For brevity, we label different configurations as follows:
 
 The expanded experimental results are as follows:
 
-<div class="row mt-3">
-    <div class="col-sm mt-3 mt-md-0">
-        {% include figure.html path="/assets/img/blog2_9.png" class="img-fluid rounded" %}
+<figure class="figure-numbered">
+    <div class="row mt-3">
+        <div class="col-sm mt-3 mt-md-0">
+            {% include figure.html path="/assets/img/blog2_9.png" class="img-fluid rounded" %}
+        </div>
     </div>
-</div>
-<div class="caption">
-  Experimental results for the Cora dataset.
-</div>
+    <figcaption>Experimental results for the Cora dataset.</figcaption>
+</figure>
 
 - Overall, the performance degenerates when we use some form of $$\mathcal{L}X$$ instead of $$X$$, although the tendency for different $$k$$ still remains the same. Considering the unnnormalized Laplaican, $$\mathcal{L} = D-A$$, the minus sign in front of the adjacency matrix suggest that we are not actually aggregating the neighbor information; rather, we are emphasizing the difference. It shows that this is a poor representation of $$X$$ to solve this task.
 - For the case where we use the symmetrically normalized Laplacian matrix, it is the only configuration that shows that the performace increases as we add more high frequency information (blue line). There can be several explanations for this:

@@ -1,0 +1,159 @@
+# Presentations data file
+# Each entry can have: title, event, description, year, materials (list of type/title/url/blog)
+
+# Featured Seminar Series (displayed at top)
+seminar_series:
+  title: "Seminar Series on Graph Learning"
+  event: "GIST (Gwangju Institute of Science and Technology)"
+  year: 2025
+  description: >
+    A series of seminars given as a guest speaker in Prof. Hong Kook Kim's group 
+    from March ~ May 2025. The seminar series covers the basics of graph learning, 
+    graph neural networks, several fundamental concepts, and applications.
+  materials:
+    - type: slides
+      title: "Session 1: Introduction to graph mining and graph neural networks"
+      url: "/assets/pdf/[GIST]01_Introduction_to_graph_mining_and_graph_neural_networks.pdf"
+    - type: slides
+      title: "Session 2: On the representational power of graph neural networks"
+      url: "/assets/pdf/[GIST]02_On_the_representational_power_of_graph_neural_networks.pdf"
+    - type: slides
+      title: "Session 3: A graph signal processing viewpoint of graph neural networks"
+      url: "/assets/pdf/[GIST]03_A_graph_signal_processing_viewpoint_of_graph_neural_networks.pdf"
+    - type: slides
+      title: "Session 4: From label propagation to graph neural networks"
+      url: "/assets/pdf/[GIST]04_From_label_propagation_to_graph_neural_networks.pdf"
+    - type: slides
+      title: "Session 5: On the problem of oversmoothing and oversquashing"
+      url: "/assets/pdf/[GIST]05_On_the_problem_of_oversmoothing_and_oversquashing.pdf"
+    - type: slides
+      title: "Session 6: Towards efficient graph learning"
+      url: "/assets/pdf/[GIST]06_Towards_efficient_graph_learning.pdf"
+    - type: slides
+      title: "Session 7: Explainable graph neural networks"
+      url: "/assets/pdf/[GIST]07_Explainable_graph_neural_networks.pdf"
+
+external:
+  - title: "A Practical Introduction to (Explainable) Graph Learning"
+    event: "Ewha Womans University"
+    year: 2025
+    description: >
+      A seminar given as a guest lecturer in April 2025.
+    materials:
+      - type: slides
+        title: "A practical introduction to (explainable) graph learning"
+        url: "/assets/pdf/Ewha_Uni_lecture.pdf"
+
+  - title: "Faithful and Accurate Self-Attention Attribution for MPNNs via the Computation Tree Viewpoint"
+    event: "AAAI 2025"
+    year: 2025
+    description: >
+      Poster for my paper accepted at AAAI 2025. The arxiv version can be found 
+      <a href="https://arxiv.org/abs/2406.04612">here</a>.
+    materials:
+      - type: poster
+        title: "Faithful and Accurate Self-Attention Attribution for MPNNs"
+        url: "/assets/pdf/Poster_final_GAtt.pdf"
+
+  - title: "On the Feasibility of Fidelity- for Graph Pruning"
+    event: "IJCAI 2024 Workshop on XAI"
+    year: 2024
+    description: >
+      Poster and presentation slides presented at the Workshop on Explainable 
+      Artificial Intelligence (XAI) at IJCAI 2024. The arxiv version can be found 
+      <a href="https://arxiv.org/abs/2406.11504">here</a>.
+    materials:
+      - type: poster
+        title: "On the Feasibility of Fidelity- for Graph Pruning"
+        url: "/assets/pdf/Poster_final_IJCAIW2024.pdf"
+      - type: slides
+        title: "On the Feasibility of Fidelity- for Graph Pruning"
+        url: "/assets/pdf/240805_IJCAIW_Presentation_Yong-Min_Shin.pdf"
+      - type: blog
+        title: "Accompanying blog post"
+        url: "/blog/2024/Fidelity_pruning/"
+
+  - title: "PAGE: Prototype-Based Model-Level Explanations for Graph Neural Networks"
+    event: "Best Academic Paper Award, Yonsei University"
+    year: 2024
+    description: >
+      Presentation slides submitted as official supplementary material after receiving 
+      the best academic paper award at the Graduate School of Yonsei University.<br>
+      <em>Original paper:</em> Shin et al., "PAGE: Prototype-Based Model-Level Explanations 
+      for Graph Neural Networks", TPAMI (2024)
+    materials:
+      - type: slides
+        title: "PAGE: Prototype-Based Model-Level Explanations for GNNs"
+        url: "/assets/pdf/Presentation_PAGE.pdf"
+      - type: poster
+        title: "PAGE (AAAI 2022 short version)"
+        url: "/assets/pdf/Poster_final_AAAI_2022.pdf"
+
+  - title: "Edgeless-GNN: Unsupervised Inductive Edgeless Network Embedding"
+    event: "28th Samsung HumanTech Award (Bronze Prize)"
+    year: 2022
+    description: >
+      Presentation given during the competition for the 28th Samsung HumanTech Award.<br>
+      <em>Original paper:</em> Shin et al., "Edgeless-GNN: Unsupervised Representation 
+      Learning for Edgeless Nodes", TETC (2022)
+    materials:
+      - type: slides
+        title: "Edgeless-GNN: Unsupervised Inductive Edgeless Network Embedding"
+        url: "/assets/pdf/EdgelessGNN_Hutech.pdf"
+
+
+internal:
+  description: >
+    In my lab, we have a weekly reading group where we present papers of our own interest. 
+    Here are some of the selected presentations that I have made in the reading group.
+  
+  items:
+    - title: "Causal Learning"
+      description: >
+        A two-part presentation introducing the basics of causal learning. I got a LOT of help from 
+        <a href="https://www.bradyneal.com/causal-inference-course">"Introduction to Causal Inference" by Brady Neal</a>. 
+        Definitely check out his course if you are interested — I personally had a lot of fun learning from it.
+      materials:
+        - type: slides
+          title: "Part 1"
+          url: "/assets/pdf/Causal_learning_part1.pdf"
+        - type: slides
+          title: "Part 2"
+          url: "/assets/pdf/Causal_learning_part2.pdf"
+
+    - title: "Self-Supervised Learning"
+      description: >
+        A presentation made when I was interested in understanding the SimCLR framework. 
+        Understanding this paper helped me better understand other papers in graph self-supervised learning.
+      materials:
+        - type: slides
+          title: "Introduction to SimCLR"
+          url: "/assets/pdf/SimCLR.pdf"
+
+    - title: "Knowledge Distillation"
+      description: >
+        A presentation made when I was interested in understanding knowledge distillation, 
+        which I eventually applied to my research on GNN-to-MLP knowledge distillation.
+      materials:
+        - type: slides
+          title: "Towards understanding knowledge distillation"
+          url: "/assets/pdf/Knowledge_distillation.pdf"
+
+    - title: "Physics-Informed Machine Learning"
+      description: >
+        A presentation made when I was interested in understanding the physics-informed machine learning landscape.
+      materials:
+        - type: slides
+          title: "Vector Neurons: A General Framework for SO(3)-Equivariant Networks"
+          url: "/assets/pdf/Vector_Neurons.pdf"
+
+    - title: "Unsupervised Disentanglement"
+      description: >
+        A review of the paper: "Challenging common assumptions in the unsupervised learning of 
+        disentangled representations" by Locatello et al. This paper is a great read if you are 
+        interested in disentangled representation learning, and personally, I found it very helpful 
+        while reading some papers in explainable AI.
+      materials:
+        - type: slides
+          title: "Challenging common assumptions in the unsupervised learning of disentangled representations"
+          url: "/assets/pdf/Unsupervised_disentanglement.pdf"

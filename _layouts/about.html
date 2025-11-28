@@ -2,83 +2,95 @@
 layout: default
 ---
 
-<!-- about.html -->
-      <div class="post">
-        <header class="post-header">
-          <h1 class="post-title">
-            {% if site.title == "blank" -%}<span class="font-weight-bold">{{ site.first_name }}</span> {{ site.middle_name }} {{ site.last_name }}{%- else -%}{{ site.title }}{%- endif %}
-          </h1>
-          <p class="desc">{{ page.subtitle }}</p>
-        </header>
+<!-- about.html - Clean, centered, minimal homepage -->
+<div class="about-page">
+  
+  <!-- Hero Section: Centered intro -->
+  <header class="about-header">
+    {%- if page.profile and page.profile.image %}
+      {%- assign profile_image_path = page.profile.image | prepend: 'assets/img/' -%}
+      <div class="profile-image-wrapper">
+        <img 
+          src="{{ profile_image_path | relative_url }}" 
+          alt="{{ site.first_name }} {{ site.last_name }}"
+          class="profile-image {% if page.profile.image_circular %}circular{% endif %}"
+        />
+      </div>
+    {%- endif %}
+    
+    <h1 class="about-title">
+      {%- if site.title == "blank" -%}
+        {{ site.first_name }} {{ site.middle_name }} {{ site.last_name }}
+      {%- else -%}
+        {{ site.title }}
+      {%- endif -%}
+    </h1>
+    
+    {%- if page.subtitle %}
+    <div class="about-subtitle">
+      {{ page.subtitle }}
+    </div>
+    {%- endif %}
+    
+    {%- if page.profile.more_info %}
+    <div class="about-contact">
+      {{ page.profile.more_info }}
+    </div>
+    {%- endif %}
+  </header>
 
-        <article>
-          {% if page.profile -%}
-          <div class="profile float-{%- if page.profile.align == 'left' -%}left{%- else -%}right{%- endif -%}">
-            {%- if page.profile.image %}
-              {%- assign profile_image_path = page.profile.image | prepend: 'assets/img/' -%}
+  <!-- Bio Section -->
+  <section class="about-bio">
+    {{ content }}
+  </section>
 
-              <!-- {% if page.profile.image_circular %}
-                {%- assign profile_image_class = "img-fluid z-depth-1 rounded-circle" -%}
-              {% else %}
-                {%- assign profile_image_class = "img-fluid z-depth-1 rounded" -%}
-              {% endif %} -->
+  <!-- News Section (if enabled) -->
+  {% if page.news and site.announcements.enabled -%}
+  <section class="about-section">
+    <h2 class="section-title">
+      <a href="{{ '/news/' | relative_url }}">Recent News</a>
+    </h2>
+    {%- include news.html limit=true %}
+  </section>
+  {%- endif %}
 
-              {% if page.profile.image_circular %}
-                {%- assign profile_image_class = "img-fluid rounded-circle" -%}
-              {% else %}
-                {%- assign profile_image_class = "img-fluid z-depth-2" -%}
-              {% endif %}
+  <!-- Selected Papers (if enabled) -->
+  {% if page.selected_papers -%}
+  <section class="about-section">
+    <h2 class="section-title">
+      <a href="{{ '/publications/' | relative_url }}">Selected Publications</a>
+    </h2>
+    {%- include selected_papers.html %}
+  </section>
+  {%- endif %}
 
-              {% include figure.html
-              path=profile_image_path
-              class=profile_image_class
-              alt=page.profile.image
-              cache_bust=true -%}
-            {% endif -%}
-            {%- if page.profile.more_info %}
-            <div class="more-info">
-              {{ page.profile.more_info }}
-            </div>
-            {%- endif %}
-          </div>
-          {%- endif %}
+  <!-- Latest Posts (if enabled) -->
+  {% if page.latest_posts -%}
+  <section class="about-section">
+    <h2 class="section-title">
+      <a href="{{ '/blog/' | relative_url }}">Latest Posts</a>
+    </h2>
+    {%- include latest_posts.html %}
+  </section>
+  {%- endif %}
 
-          <div class="clearfix">
-            {{ content }}
-          </div>
+  <!-- Social (if enabled) -->
+  {%- if page.social %}
+  <section class="about-social">
+    <div class="contact-icons">
+      {% include social.html %}
+    </div>
+    {%- if site.contact_note %}
+    <div class="contact-note">
+      {{ site.contact_note }}
+    </div>
+    {%- endif %}
+  </section>
+  {%- endif %}
 
-          <!-- News -->
-          {% if page.news and site.announcements.enabled -%}
-            <h2><a href="{{ '/news/' | relative_url }}" style="color: inherit;">News</a></h2>
-            {%- include news.html limit=true %}
-          {%- endif %}
-
-
-          <!-- Selected papers -->
-          {% if page.selected_papers -%}
-            <h2><a href="{{ '/publications/' | relative_url }}" style="color: inherit;">Publications</a></h2>
-            {%- include selected_papers.html %}
-          {%- endif %}
-
-          <!-- Latest posts -->
-          {% if page.latest_posts -%}
-            <h2><a href="{{ '/blog/' | relative_url }}" style="color: inherit;">Latest posts</a></h2>
-            {%- include latest_posts.html %}
-          {%- endif %}
-
-          <!-- Social -->
-          {%- if page.social %}
-            <div class="social">
-              <div class="contact-icons">
-                {% include social.html %}
-              </div>
-
-              <div class="contact-note">
-                {{ site.contact_note }}
-              </div>
-
-            </div>
-          {%- endif %}
-        </article>
+  <!-- Site Credits -->
+  <p class="about-credits">
+    This website is based on the <a href="https://github.com/alshedivat/al-folio">al-folio</a> theme with <a href="https://brailleinstitute.org/freefont">Atkinson Hyperlegible</a> font.
+  </p>
 
 </div>

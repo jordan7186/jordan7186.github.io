@@ -1,23 +1,30 @@
 ---
 layout: post 
 title: Revisiting Modern Benchmarks for Semi-suparvised Node Classification using Classical Methods
-description: 
+description: Applying classical label propagation methods to modern graph benchmark datasets
 tags: Graph_learning  
 giscus_comments: true 
 date: 2022-10-08
 featured: true
 categories: ClassicalMethods
-related_publications: Zhou2003labelprop, Yang2016planetoid
-toc:
-  sidebar: left
-# Below is an example of injecting additional post-specific styles.
-# If you use this post as a template, delete this _styles block.
-
+series: gnn-fundamentals
+series_part: 1
+references:
+  - authors: "Zhou, D., Bousquet, O., Lal, T. N., Weston, J., & Schölkopf, B."
+    year: 2003
+    title: "Learning with Local and Global Consistency"
+    venue: "NeurIPS"
+    url: "https://proceedings.neurips.cc/paper/2003/hash/87682805257e619d49b8e0dfdc14affa-Abstract.html"
+  - authors: "Yang, Z., Cohen, W., & Salakhutdinov, R."
+    year: 2016
+    title: "Revisiting Semi-Supervised Learning with Graph Embeddings"
+    venue: "ICML"
+    url: "https://arxiv.org/abs/1603.08861"
 ---
 
 ## Introduction
 
-Semi-supervised learning (SSL) is one of the most widely studied tasks in machine learning. As the ‘supervised’ part of the name suggessts, data instances are accompanied by its labels, which are sereved as the ground-truth. However, ‘semi’ suggests that not all given instance are learned by supervised learning, but rather a (small) portion of it also have access its ground-truth labels by the model. In the context of graph learning, the task of (semi-supervised) node classification is of the main concern for many research papers. The history to solve this task goes quite a way back, one of which is (Zhou et al., 2003), published back in 2003, before the era of machine learning.
+Semi-supervised learning (SSL) is one of the most widely studied tasks in machine learning. As the ‘supervised’ part of the name suggessts, data instances are accompanied by its labels, which are sereved as the ground-truth. However, ‘semi’ suggests that not all given instance are learned by supervised learning, but rather a (small) portion of it also have access its ground-truth labels by the model. In the context of graph learning, the task of (semi-supervised) node classification is of the main concern for many research papers. The history to solve this task goes quite a way back, one of which is <span class="citation" data-preview="Zhou, D., Bousquet, O., Lal, T. N., Weston, J., & Schölkopf, B. (2003). Learning with Local and Global Consistency. NeurIPS.">(Zhou et al., 2003)</span>, published back in 2003, before the era of machine learning.
 
 In this post, I will revisit this classic method and apply to one of the more modern benchmark datasets, and try to see what analysis can be done to gain some insights.
 
@@ -72,7 +79,7 @@ $$
 
 ## Application to Cora
 
-Cora is perhaps the most used graph benchmark dataset for evaluating on node or edge level tasks (popularized by (Yang et al., 2016). As mentioned, we will only use the graph structure data as the algorithm does not accept node feature as input.
+Cora is perhaps the most used graph benchmark dataset for evaluating on node or edge level tasks (popularized by <span class="citation" data-preview="Yang, Z., Cohen, W., & Salakhutdinov, R. (2016). Revisiting Semi-Supervised Learning with Graph Embeddings. ICML.">(Yang et al., 2016)</span>). As mentioned, we will only use the graph structure data as the algorithm does not accept node feature as input.
 
 We will use [pytorch](https://pytorch.org/) and [pytorch geometric](https://pytorch-geometric.readthedocs.io/) as our base framework.
 
@@ -168,14 +175,14 @@ Here, the performance is measured by accuracy (for the test nodes of course).
 
 Plotting all experiment sessions in which we perform experiments with different values of alpha:
 
-<div class="row mt-3">
-    <div class="col-sm mt-3 mt-md-0">
-        {% include figure.html path="/assets/img/blog1_1.jpg" class="img-fluid rounded z-depth-1" %}
+<figure class="figure-numbered">
+    <div class="row mt-3">
+        <div class="col-sm mt-3 mt-md-0">
+            {% include figure.html path="/assets/img/blog1_1.jpg" class="img-fluid rounded z-depth-1" %}
+        </div>
     </div>
-</div>
-<div class="caption">
-  Plot of performance vs. iteration, while varying the value of alpha.
-</div>
+    <figcaption>Plot of performance vs. iteration, while varying the value of alpha.</figcaption>
+</figure>
 
 According to this result, there are some interesting characteristics that we can observe:
 
@@ -210,14 +217,14 @@ for alpha in alpha_list:
 Again, plotting all results of the limit solution version as a plot results in:
 
 
-<div class="row mt-3">
-    <div class="col-sm mt-3 mt-md-0">
-        {% include figure.html path="assets/img/blog1_2.png" class="img-fluid rounded z-depth-1" %}
+<figure class="figure-numbered">
+    <div class="row mt-3">
+        <div class="col-sm mt-3 mt-md-0">
+            {% include figure.html path="assets/img/blog1_2.png" class="img-fluid rounded z-depth-1" %}
+        </div>
     </div>
-</div>
-<div class="caption">
-  Plot of performance against different values of alpha. The performane of MLP is also shown as the dotted line.
-</div>
+    <figcaption>Plot of performance against different values of alpha. The performance of MLP is also shown as the dotted line.</figcaption>
+</figure>
 
 From this plot, we also observe some characteristics:
 
@@ -226,14 +233,14 @@ From this plot, we also observe some characteristics:
 
 Additionally, we can plot the asymtotic behavior of the iteative algorithm:
 
-<div class="row mt-3">
-    <div class="col-sm mt-3 mt-md-0">
-        {% include figure.html path="/assets/img/blog1_3.png" class="img-fluid rounded z-depth-1" %}
+<figure class="figure-numbered">
+    <div class="row mt-3">
+        <div class="col-sm mt-3 mt-md-0">
+            {% include figure.html path="/assets/img/blog1_3.png" class="img-fluid rounded z-depth-1" %}
+        </div>
     </div>
-</div>
-<div class="caption">
-  Plot of the performance vs. iteration, compared between the iterative solution and the analytic in the limit.
-</div>
+    <figcaption>Plot of the performance vs. iteration, compared between the iterative solution and the analytic in the limit.</figcaption>
+</figure>
 
 As mentioned, the iteration converges quite fast, and achieves the optimal performance near ~10 iterations. However, we need furhter experimental evaluations to see whether this fast convergence is due to the dataset or the algorithm.
 

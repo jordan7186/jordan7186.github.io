@@ -1,18 +1,13 @@
 ---
 layout: post 
 title: On the feasibility of fidelity- for graph pruning
-description: 
+description: Exploring whether GNN explanation methods can be repurposed for graph pruning
 tags: Graph_learning, XAI
 giscus_comments: true 
 date: 2024-08-03
 featured: true
 categories: Graph_pruning
-related_publications: 
-toc:
-  sidebar: left
-# Below is an example of injecting additional post-specific styles.
-# If you use this post as a template, delete this _styles block.
-
+tldr: We investigate whether GNN explanation methods can be used for graph pruning, since they already identify "unimportant" edges. Our experiments show that explanation-based pruning significantly underperforms compared to dedicated pruning methods.
 ---
 
 [Full paper](https://arxiv.org/abs/2406.11504v1), [Workshop site](https://sites.google.com/view/xai2024/home), [Presentation slides](https://drive.google.com/file/d/1wLAkPpL-2UHZcwUcn7dFT6UOjkvYhSTb/view?usp=sharing), [Poster](https://drive.google.com/file/d/1QlNp618vzLtTdMqMuS8IEVQAvUL3msQ5/view?usp=sharing)
@@ -55,14 +50,14 @@ Well, now we know how to convert explanations into pruning graphs, the next ques
 
 And for graph pruning, we also throw in a random baseline (random removal). We show for four datasets (BAShapes, Cora, Citeseer and Pubmed), and consider both sum and averaging during FiP:
 
+<figure class="figure-numbered">
 <div class="row mt-3">
     <div class="col-sm mt-3 mt-md-0">
         {% include figure.html path="/assets/img/blog6_1.png" class="img-fluid rounded z-depth-1" %}
     </div>
 </div>
-<div class="caption">
-  Graph pruning results using various explanation methods.
-</div>
+<figcaption>Graph pruning results using various explanation methods.</figcaption>
+</figure>
 
 There are some interesting points worth mentioning:
 
@@ -73,14 +68,14 @@ There are some interesting points worth mentioning:
 
 Taken quite aback, we had to check the actual fideltiy$$^{-}$$ scores for each method. After all, the idea of using explanations for graph pruning came from fideltiy$$^{-}$$:
 
+<figure class="figure-numbered">
 <div class="row mt-3">
     <div class="col-sm mt-3 mt-md-0">
         {% include figure.html path="/assets/img/blog6_2.png" class="img-fluid rounded z-depth-1" %}
     </div>
 </div>
-<div class="caption">
-  Fidelity- scores for various explanation methods.
-</div>
+<figcaption>Fidelity- scores for various explanation methods.</figcaption>
+</figure>
 
 In summary, the table suggests that fideltiy$$^{-}$$ scores does not necessarily translate to good graph pruning performances: Especially looking at GNNExplainer, it shows the best fideltiy$$^{-}$$ scores for two datasets, despite being one of the poorest in the graph pruning experiment.
 

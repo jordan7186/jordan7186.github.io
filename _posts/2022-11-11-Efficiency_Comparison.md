@@ -1,25 +1,47 @@
 ---
 layout: post 
 title: Comparing the Efficiency of ChebConv, GCN, and SGC 
-description: 
+description: A comprehensive efficiency comparison of three popular spectral graph neural network models
 tags: Graph_learning  
 giscus_comments: true 
 date: 2022-11-11
 featured: true
 categories: Efficiency
-related_publications: Shuman2013graphspectral, Defferrard2016chebconv, Wu2019sgc, Dehghani2022efficiency, Hamilton2017graphsage 
-toc:
-  sidebar: left
-# Below is an example of injecting additional post-specific styles.
-# If you use this post as a template, delete this _styles block.
-
+series: gnn-fundamentals
+series_part: 2
+references:
+  - authors: "Shuman, D. I., Narang, S. K., Frossard, P., Ortega, A., & Vandergheynst, P."
+    year: 2013
+    title: "The Emerging Field of Signal Processing on Graphs"
+    venue: "IEEE Signal Processing Magazine"
+    url: "https://arxiv.org/abs/1211.0053"
+  - authors: "Defferrard, M., Bresson, X., & Vandergheynst, P."
+    year: 2016
+    title: "Convolutional Neural Networks on Graphs with Fast Localized Spectral Filtering"
+    venue: "NeurIPS"
+    url: "https://arxiv.org/abs/1606.09375"
+  - authors: "Wu, F., Souza, A., Zhang, T., Fifty, C., Yu, T., & Weinberger, K."
+    year: 2019
+    title: "Simplifying Graph Convolutional Networks"
+    venue: "ICML"
+    url: "https://arxiv.org/abs/1902.07153"
+  - authors: "Dehghani, M., et al."
+    year: 2022
+    title: "The Efficiency Misnomer"
+    venue: "ICLR"
+    url: "https://arxiv.org/abs/2110.12894"
+  - authors: "Hamilton, W., Ying, Z., & Leskovec, J."
+    year: 2017
+    title: "Inductive Representation Learning on Large Graphs"
+    venue: "NeurIPS"
+    url: "https://arxiv.org/abs/1706.02216"
 ---
 
 # Introduction
 
-In the current deep learning era that we live in, we now have various models that are widely used not only in research but also real-world problem solving in other data types such as image and natural languages: ResNet, YOLO, BERT, GPT, to name a few. The equivalent model in the field of graph data is perhaps the GCN model (Graph Convolutional Networks) (Kipf & Welling, 2017). 
+In the current deep learning era that we live in, we now have various models that are widely used not only in research but also real-world problem solving in other data types such as image and natural languages: ResNet, YOLO, BERT, GPT, to name a few. The equivalent model in the field of graph data is perhaps the GCN model (Graph Convolutional Networks) <span class="citation" data-preview="Kipf, T. N., & Welling, M. (2017). Semi-Supervised Classification with Graph Convolutional Networks. ICLR.">(Kipf & Welling, 2017)</span>. 
 
-GCN continues the effort made in ChebConv (Defferrard et al., 2016) in trying to build an efficient yet effective graph learning model, based on the framework of graph signal processing. Although not as commonly used but still well-known, SGC (Simple Graph Convolution) (Wu et al., 2019) proposes an even simpler model on top of GCN, resulting in the most straightforward model to interpret out of the three models. In this post, we will attempt to comprehensively compare the three models in terms of efficiency.
+GCN continues the effort made in ChebConv <span class="citation" data-preview="Defferrard, M., Bresson, X., & Vandergheynst, P. (2016). Convolutional Neural Networks on Graphs with Fast Localized Spectral Filtering. NeurIPS.">(Defferrard et al., 2016)</span> in trying to build an efficient yet effective graph learning model, based on the framework of graph signal processing. Although not as commonly used but still well-known, SGC (Simple Graph Convolution) <span class="citation" data-preview="Wu, F., Souza, A., Zhang, T., Fifty, C., Yu, T., & Weinberger, K. (2019). Simplifying Graph Convolutional Networks. ICML.">(Wu et al., 2019)</span> proposes an even simpler model on top of GCN, resulting in the most straightforward model to interpret out of the three models. In this post, we will attempt to comprehensively compare the three models in terms of efficiency.
 
 # Architecture of three models
 
@@ -67,7 +89,7 @@ $$
 \tilde{D}^{-1/2}\tilde{A}\tilde{D}^{-1/2}\theta
 $$
 
-, where $$\tilde{A} = A + I$$, and $$\tilde{D}$$ follows a similar definition from $$D$$. For a general $$C$$-dimensional graph signal $$X \in \mathbb{R}^{|V| \times C}$$, we get the final convolution for GCN:
+, where $$\tilde{A} = A + I$$, and $$\tilde{D}$$ follows a similar definition from $$D$$. For a general $$C$$-dimensional graph signal $$X \in \mathbb{R}^{\lvert V \rvert \times C}$$, we get the final convolution for GCN:
 
 $$
 \text{GCNConv} = \tilde{D}^{-1/2}\tilde{A}\tilde{D}^{-1/2}X\Theta
@@ -218,7 +240,7 @@ For the implementation, we will use **pytorch** with **pytorch geometric** as th
     ```
     
 
-As for the measurement of **efficiency**, we take the message from [4] to heart. The authors of [4] suggest to draw plots using as multiple cost indicators, rather than highlighting only one. In this experiment, we consider the following cost indicators:
+As for the measurement of **efficiency**, we take the message from <span class="citation" data-preview="Dehghani, M., et al. (2022). The Efficiency Misnomer. ICLR.">(Dehghani et al., 2022)</span> to heart. The authors suggest to draw plots using as multiple cost indicators, rather than highlighting only one. In this experiment, we consider the following cost indicators:
 
 - FLOPs
 - MACs
@@ -261,34 +283,34 @@ class Custom_Profiler:
 Now, lets plot FLOPs, MACs and latency of ChebConv, GCN, SGC for different receptive fields:
 
 
-<div class="row mt-3">
-    <div class="col-sm mt-3 mt-md-0">
-        {% include figure.html path="/assets/img/blog4_1.png" class="img-fluid rounded z-depth-1" %}
+<figure class="figure-numbered">
+    <div class="row mt-3">
+        <div class="col-sm mt-3 mt-md-0">
+            {% include figure.html path="/assets/img/blog4_1.png" class="img-fluid rounded z-depth-1" %}
+        </div>
     </div>
-</div>
-<div class="caption">
-  Plot of FLOPs vs. receptive field.
-</div>
+    <figcaption>Plot of FLOPs vs. receptive field.</figcaption>
+</figure>
 
 
-<div class="row mt-3">
-    <div class="col-sm mt-3 mt-md-0">
-        {% include figure.html path="/assets/img/blog4_2.png" class="img-fluid rounded z-depth-1" %}
+<figure class="figure-numbered">
+    <div class="row mt-3">
+        <div class="col-sm mt-3 mt-md-0">
+            {% include figure.html path="/assets/img/blog4_2.png" class="img-fluid rounded z-depth-1" %}
+        </div>
     </div>
-</div>
-<div class="caption">
-  Plot of MACs vs. receptive field.
-</div>
+    <figcaption>Plot of MACs vs. receptive field.</figcaption>
+</figure>
 
 
-<div class="row mt-3">
-    <div class="col-sm mt-3 mt-md-0">
-        {% include figure.html path="/assets/img/blog4_3.png" class="img-fluid rounded z-depth-1" %}
+<figure class="figure-numbered">
+    <div class="row mt-3">
+        <div class="col-sm mt-3 mt-md-0">
+            {% include figure.html path="/assets/img/blog4_3.png" class="img-fluid rounded z-depth-1" %}
+        </div>
     </div>
-</div>
-<div class="caption">
-  Plot of Latency (sec/graph) vs. receptive field.
-</div>
+    <figcaption>Plot of Latency (sec/graph) vs. receptive field.</figcaption>
+</figure>
 
 - For all three measures of cost indicators, ChebConv performs the worst out of all model architectures considered.
 - For FLOPs and MACs, the difference between GCN and SGC are quite marginal, even as we stack the number of layers.

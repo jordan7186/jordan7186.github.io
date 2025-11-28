@@ -1,0 +1,83 @@
+{% comment %}
+Series Navigation Component
+Shows series info and prev/next navigation for posts in a series
+Usage: {% include series-nav.html %}
+{% endcomment %}
+
+{% if page.series %}
+  {% assign current_series = nil %}
+  {% assign current_part = nil %}
+  {% assign prev_post = nil %}
+  {% assign next_post = nil %}
+  
+  {% for s in site.data.series %}
+    {% if s.id == page.series %}
+      {% assign current_series = s %}
+      {% break %}
+    {% endif %}
+  {% endfor %}
+  
+  {% if current_series %}
+    {% assign total_parts = current_series.posts | size %}
+    
+    {% for part in current_series.posts %}
+      {% if part.part == page.series_part %}
+        {% assign current_part = part %}
+        {% assign part_index = forloop.index0 %}
+      {% endif %}
+    {% endfor %}
+    
+    {% if part_index > 0 %}
+      {% assign prev_index = part_index | minus: 1 %}
+      {% assign prev_part = current_series.posts[prev_index] %}
+      {% for post in site.posts %}
+        {% assign post_slug = post.path | split: "/" | last | replace: ".md", "" %}
+        {% if post_slug == prev_part.slug %}
+          {% assign prev_post = post %}
+          {% assign prev_title = prev_part.title %}
+          {% break %}
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+    
+    {% assign next_index = part_index | plus: 1 %}
+    {% if next_index < total_parts %}
+      {% assign next_part = current_series.posts[next_index] %}
+      {% for post in site.posts %}
+        {% assign post_slug = post.path | split: "/" | last | replace: ".md", "" %}
+        {% if post_slug == next_part.slug %}
+          {% assign next_post = post %}
+          {% assign next_title = next_part.title %}
+          {% break %}
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+
+<div class="series-nav">
+  <div class="series-nav-header">
+    <span class="series-label">📚 Part {{ page.series_part }} of {{ total_parts }}</span>
+    <span class="series-title">{{ current_series.title }}</span>
+  </div>
+  
+  <div class="series-nav-links">
+    {% if prev_post %}
+    <a href="{{ prev_post.url | relative_url }}" class="series-nav-link series-nav-prev">
+      <span class="series-nav-direction">← Previous</span>
+      <span class="series-nav-part-title">{{ prev_title }}</span>
+    </a>
+    {% else %}
+    <div class="series-nav-link series-nav-placeholder"></div>
+    {% endif %}
+    
+    {% if next_post %}
+    <a href="{{ next_post.url | relative_url }}" class="series-nav-link series-nav-next">
+      <span class="series-nav-direction">Next →</span>
+      <span class="series-nav-part-title">{{ next_title }}</span>
+    </a>
+    {% else %}
+    <div class="series-nav-link series-nav-placeholder"></div>
+    {% endif %}
+  </div>
+</div>
+  {% endif %}
+{% endif %}

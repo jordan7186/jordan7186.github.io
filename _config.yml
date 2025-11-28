@@ -119,8 +119,8 @@ bing_site_verification:  # out your bing-site-verification ID (Bing Webmaster)
 # Blog
 # -----------------------------------------------------------------------------
 
-blog_name: Graph Learning Blog # blog_name will be displayed in your blog page
-blog_nav_title: Graph Learning Blog # your blog must have a title for it to be displayed in the nav bar
+blog_name: Blog # blog_name will be displayed in your blog page
+blog_nav_title: Blog # your blog must have a title for it to be displayed in the nav bar
 blog_description: Some random experiments, just for fun!
 permalink: /blog/:year/:title/
 
@@ -302,7 +302,7 @@ enable_publication_badges:
   dimensions: true # Dimensions badge (https://badge.dimensions.ai/)
 
 # Filter out certain bibtex entry keywords used internally from the bib output
-filtered_bibtex_keywords: [abbr, abstract, arxiv, bibtex_show, html, pdf, selected, supp, blog, code, poster, slides, website, preview, altmetric]
+filtered_bibtex_keywords: [abbr, abstract, arxiv, bibtex_show, html, pdf, selected, supp, blog, code, poster, slides, website, preview, altmetric, mine]
 
 # Maximum number of authors to be shown for each publication (more authors are visible on click)
 max_author_limit:   # leave blank to always show all authors
