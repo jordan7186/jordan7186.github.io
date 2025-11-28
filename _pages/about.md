@@ -21,7 +21,7 @@ latest_posts: false
 social: false
 ---
 
-Hello! I am a research scientist working at the Material intelligence lab in [**LG AI Research**](https://lgresearch.ai/), solving various real-world problems using machine learning, including building an AI-powered autonomous lab system. Before joining LG AI Research, I completed my Ph.D at the [MIDaS Lab](https://sites.google.com/site/midasyonsei) led by *Prof. Won-Yong Shin*, [Dept. Computer Science & Engineering](https://cse.yonsei.ac.kr/cse/index.do) in Yonsei University, Seoul, South Korea.
+Hello! I am a research scientist working at the **Material intelligence lab** in [LG AI Research](https://lgresearch.ai/), solving various real-world problems using machine learning, including building an AI-powered autonomous lab system. Before joining LG AI Research, I completed my Ph.D at the [MIDaS Lab](https://sites.google.com/site/midasyonsei) led by *Prof. Won-Yong Shin*, [Dept. Computer Science & Engineering](https://cse.yonsei.ac.kr/cse/index.do) in Yonsei University, Seoul, South Korea.
 
 During my Ph.D, my primary interest was to find elegant and simple solutions to interesting and important problems on **graph data** and **graph neural networks (GNNs).** More specifically, my main research topics have been focused primarily on **Explainability** in graph neural networks as well as **Efficient** graph learning. I am still interested in these topics, and I am currently exploring how to apply explainable and efficient graph learning techniques to real-world applications in the material science domain.
 
