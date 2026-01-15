@@ -34,6 +34,15 @@ seminar_series:
       url: "/assets/pdf/[GIST]07_Explainable_graph_neural_networks.pdf"
 
 external:
+  - title: "Towards understanding the connection between GNNs and the Weisfeiler-Lehman test"
+    event: "LG AI Internal Seminar" 
+    year: 2026
+    description: "An introductory seminar on relationship between Graph Neural Networks and the Weisfeiler-Lehman test."
+    materials:
+      - title: "Slides"
+        url: /assets/pdf/[LGAI]Towards_understanding_GNN_WL.pdf
+        type: "slides"
+
   - title: "A Practical Introduction to (Explainable) Graph Learning"
     event: "Ewha Womans University"
     year: 2025
