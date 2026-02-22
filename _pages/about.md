@@ -36,5 +36,5 @@ I am always open to new ideas and collaborations, so feel free to reach out to m
 
 Here is my formal [CV](/assets/pdf/CV.pdf) :)
 
-And I also have a <a href="https://yongminshin.thesimple.ink/">personal blog</a>, though it is under some renovation at the moment. Nevertheless, please check it out!
+Btw, I also have a <a href="https://organizedraw.kinsta.page/">personal photography blog page</a>. Check it out!
 
