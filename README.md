@@ -1,3 +1,30 @@
+## Local Docker Quickstart
+
+Start the local Jekyll server:
+
+```bash
+docker compose up
+```
+
+Then open the site in your browser:
+
+```text
+http://localhost:8080/
+```
+
+Stop the Docker container:
+
+```bash
+docker compose down
+```
+
+If Docker dependencies or certificates changed, rebuild once before starting:
+
+```bash
+docker compose build
+docker compose up
+```
+
 # al-folio
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [maintainers]: https://img.shields.io/badge/maintainers-4-success.svg 'Number of maintainers'

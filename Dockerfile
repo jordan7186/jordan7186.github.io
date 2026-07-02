@@ -1,9 +1,10 @@
-FROM ubuntu:latest
+FROM ubuntu:24.04
 ENV DEBIAN_FRONTEND noninteractive
 
 Label MAINTAINER Amir Pourmand
 
 RUN apt-get update -y && apt-get install -y --no-install-recommends \
+    ca-certificates \
     locales \
     imagemagick \
     ruby-full \
@@ -12,6 +13,10 @@ RUN apt-get update -y && apt-get install -y --no-install-recommends \
     jupyter-nbconvert \
     inotify-tools procps && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
+
+COPY .docker/certs/ /usr/local/share/ca-certificates/
+
+RUN update-ca-certificates
 
 
 RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && \
