@@ -81,6 +81,15 @@
     root.appendChild(fig);
     return fig;
   }
+  function typesetMath(node) {
+    if (!window.MathJax) return;
+    if (window.MathJax.typesetPromise) window.MathJax.typesetPromise([node]).catch(function () {});
+    else if (window.MathJax.startup && window.MathJax.startup.promise) {
+      window.MathJax.startup.promise.then(function () {
+        if (window.MathJax.typesetPromise) window.MathJax.typesetPromise([node]).catch(function () {});
+      });
+    }
+  }
   function selectCtl(label, options, onchange, initial) {
     var sel = h("select", { class: "tgt-select" });
     options.forEach(function (o) {
@@ -622,7 +631,7 @@
 
     var graphWrap = h("div", { class: "tgt-panel tgt-panel-wide" });
     var readout = h("div", { class: "tgt-info" });
-    graphWrap.appendChild(h("div", { class: "tgt-cap", text: "each node shows its predicted degree \u00b7 blue = correct, red = wrong \u00b7 move the slider to steer" }));
+    graphWrap.appendChild(h("div", { class: "tgt-cap", text: "Each node shows its predicted degree. | Blue = correct, Red = wrong. | Move the slider to steer." }));
     fig.appendChild(controls); fig.appendChild(graphWrap); fig.appendChild(readout);
     var state = { data: null, ai: 0, view: null };
     var slider = h("input", { type: "range", min: "0", max: "24", value: "12", step: "1", class: "tgt-range" });
@@ -631,7 +640,9 @@
     getJSON("degree_steering.json").then(function (d) {
       state.data = d; state.ai = d.alphas.indexOf(0); if (state.ai < 0) state.ai = 0;
       slider.max = String(d.alphas.length - 1); slider.value = state.ai;
-      controls.appendChild(h("label", { class: "tgt-ctl tgt-ctl-wide" }, [h("span", { text: "steering strength" }), slider]));
+      var strengthCtl = h("label", { class: "tgt-ctl tgt-ctl-wide" }, [h("span", { class: "tgt-math-label", html: "Steering strength \\(\\alpha\\)" }), slider]);
+      controls.appendChild(strengthCtl);
+      typesetMath(strengthCtl);
       state.view = new GraphView({
         n: d.num_nodes, edges: d.edges, width: 460, height: 340, radius: 9,
         onHover: function () { },
@@ -656,7 +667,7 @@
       readout.innerHTML = "";
       readout.appendChild(h("span", { class: "tgt-stat", html: "\u03b1 = <b>" + d.alphas[state.ai] + "</b>" }));
       readout.appendChild(h("span", { class: "tgt-stat", html: "accuracy <b>" + (row.accuracy * 100).toFixed(0) + "%</b> (" + Math.round(row.accuracy * d.num_nodes) + "/" + d.num_nodes + ")" }));
-      readout.appendChild(h("span", { class: "tgt-hint", text: "at \u03b1=0 the clean model is 100% correct; steering along the degree direction flips node predictions (precomputed)" }));
+    //   readout.appendChild(h("span", { class: "tgt-hint", text: "at \u03b1=0 the clean model is 100% correct; steering along the degree direction flips node predictions (precomputed)" }));
     }
   }
 
@@ -673,7 +684,7 @@
 
     var graphWrap = h("div", { class: "tgt-panel tgt-panel-wide" });
     var readout = h("div", { class: "tgt-info" });
-    graphWrap.appendChild(h("div", { class: "tgt-cap", text: "border: indigo = ring, crimson = non-ring \u00b7 fill: blue = correct, red = wrong \u00b7 ablate L1 with the slider" }));
+    graphWrap.appendChild(h("div", { class: "tgt-cap", text: "Border color: Indigo = ring, Crimson = non-ring | Fill color: Blue = correct, Red = wrong | Ablate L1 with the slider." }));
     fig.appendChild(controls); fig.appendChild(graphWrap); fig.appendChild(readout);
     var state = { data: null, si: 0, view: null };
     var slider = h("input", { type: "range", min: "0", max: "10", value: "0", step: "1", class: "tgt-range" });
