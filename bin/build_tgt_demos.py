@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
-"""Trim demo_package_2 static results into lightweight web assets.
+"""Trim demo_package_2/3 static results into lightweight web assets.
 
-Reads the revised, model-backed static results and writes small, rounded JSON
-files into ``assets/json/tgt-demos/`` for the interactive blog post
-"Discovering Mechanisms in Tokenized Graph Transformers".
+Attention examples come from demo_package_3 (ring graph with an actual ring);
+everything else comes from demo_package_2.
 
-Offline, one-time build step. Generated JSON is committed; the demo package is
+Offline, one-time build step. Generated JSON is committed; the demo packages are
 not required at deploy time. No PyTorch / checkpoints / datasets are touched.
 
 Usage:
-    python bin/build_tgt_demos.py [--src ../demo_package_2/static_results]
+    python bin/build_tgt_demos.py \
+        [--src  ../demo_package_2/static_results] \
+        [--attn-src ../demo_package_3/static_results]
 """
 
 from __future__ import annotations
@@ -135,16 +136,20 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--src", default="../demo_package_2/static_results",
                         help="Path to demo_package_2/static_results (default: %(default)s)")
+    parser.add_argument("--attn-src", default="../demo_package_3/static_results",
+                        dest="attn_src",
+                        help="Path to attention examples (default: %(default)s)")
     parser.add_argument("--out", default="assets/json/tgt-demos",
                         help="Output directory (default: %(default)s)")
     args = parser.parse_args()
 
     src = Path(args.src).resolve()
+    attn_src = Path(args.attn_src).resolve()
     out = Path(args.out).resolve()
     out.mkdir(parents=True, exist_ok=True)
-    print(f"src: {src}\nout: {out}")
+    print(f"src: {src}\nattn_src: {attn_src}\nout: {out}")
 
-    build_attention(src, out)
+    build_attention(attn_src, out)
     build_degree_steering(src, out)
     build_ring_ablation(src, out)
     build_spd(src, out)
