@@ -25,16 +25,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout 🛎️
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7
     - name: Setup Ruby
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: '3.2.2'
         bundler-cache: true
     - name: Setup Pages
-      uses: actions/configure-pages@v4
+      uses: actions/configure-pages@v6
     - name: Update _config.yml ⚙️
-      uses: fjogeleit/yaml-update-action@v0.13.1
+      uses: fjogeleit/yaml-update-action@v0.17.0
       with:
         commitChange: false
         valueFile: '_config.yml'
@@ -48,7 +48,7 @@ jobs:
       env:
         JEKYLL_ENV: production
     - name: Upload artifact
-      uses: actions/upload-pages-artifact@v3
+      uses: actions/upload-pages-artifact@v5
       with:
         path: _site
 
@@ -63,4 +63,3 @@ jobs:
     - name: Deploy to GitHub Pages 🚀
       id: deployment
       uses: actions/deploy-pages@v5
-
