@@ -76,15 +76,16 @@ toc:
 /* tooltip */
 .tgt-tip { position:fixed; z-index:1000; pointer-events:none; background:rgba(20,22,45,.94); color:#fff; font-size:.72rem; line-height:1.35; padding:5px 8px; border-radius:5px; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; box-shadow:0 2px 8px rgba(0,0,0,.25); display:none; }
 /* schematic */
-.tgt-schem { display:flex; flex-direction:column; gap:0; margin-right:16px; padding-right:16px; border-right:1px solid var(--tgt-line); }
-.tgt-schem-l { display:flex; gap:2px; align-items:center; }
-.tgt-schem-h { width:12px; height:12px; background:#ececf3; border:1px solid #d0d0d8; border-radius:2px; transition:background .3s; }
+.tgt-schem { display:flex; flex-direction:column; gap:0; margin-right:16px; padding-right:16px; border-right:1px solid var(--tgt-line); line-height:0; }
+.tgt-schem-l { display:flex; gap:2px; align-items:center; height:12px; margin:0; }
+.tgt-schem-l + .tgt-schem-l { margin-top:-1px; }
+.tgt-schem-h { display:block; box-sizing:border-box; width:12px; height:12px; margin:0; background:#ececf3; border:1px solid #d0d0d8; border-radius:2px; transition:background .3s; }
 .tgt-schem-h.active { background:var(--tgt-indigo); border-color:var(--tgt-indigo); box-shadow:0 0 4px var(--tgt-indigo); }
 .tgt-schem-h.active-res { background:var(--tgt-crimson); border-color:var(--tgt-crimson); box-shadow:0 0 4px var(--tgt-crimson); }
 .tgt-schem-lab { font-size:8px; color:var(--tgt-muted); text-align:center; margin-top:2px; font-family:ui-monospace,monospace; }
-.tgt-schem-l-lab { font-size:8px; color:var(--tgt-muted); width:12px; text-align:right; margin-right:2px; font-family:ui-monospace,monospace; }
-.tgt-schem-h-labs { display:flex; gap:2px; margin-left:16px; }
-.tgt-schem-h-lab { width:12px; font-size:8px; color:var(--tgt-muted); text-align:center; font-family:ui-monospace,monospace; }
+.tgt-schem-l-lab { font-size:8px; line-height:12px; color:var(--tgt-muted); width:12px; text-align:right; margin-right:2px; font-family:ui-monospace,monospace; }
+.tgt-schem-h-labs { display:flex; align-items:flex-end; gap:2px; height:8px; margin:0 0 0 16px; line-height:8px; }
+.tgt-schem-h-lab { width:12px; height:8px; font-size:8px; line-height:8px; color:var(--tgt-muted); text-align:center; font-family:ui-monospace,monospace; }
 </style>
 
 ## Overview
