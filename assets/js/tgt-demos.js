@@ -400,32 +400,59 @@
   }
 
   // ---- canvas heatmap -----------------------------------------------------
+  // opts.rowLabels / opts.colLabels : arrays of strings drawn outside the grid.
   function drawHeatmap(canvas, matrix, opts) {
     opts = opts || {};
     var n = matrix.length, m = matrix[0].length;
-    var cell = opts.cell || Math.max(6, Math.floor(360 / Math.max(n, m)));
-    canvas.width = m * cell; canvas.height = n * cell;
-    canvas.style.width = (m * cell) + "px"; canvas.style.height = (n * cell) + "px";
+    var cell = opts.cell || Math.max(8, Math.floor(360 / Math.max(n, m)));
+    var mL = opts.rowLabels ? (opts.margin || 46) : 0;
+    var mT = opts.colLabels ? (opts.margin || 46) : 0;
+    canvas.width = mL + m * cell; canvas.height = mT + n * cell;
+    canvas.style.width = canvas.width + "px"; canvas.style.height = canvas.height + "px";
     var ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     var vmax = opts.vmax;
     if (vmax == null) { vmax = 0; for (var a = 0; a < n; a++) for (var b = 0; b < m; b++) { var val = opts.diverging ? Math.abs(matrix[a][b]) : matrix[a][b]; if (val > vmax) vmax = val; } }
     for (var i = 0; i < n; i++) for (var j = 0; j < m; j++) {
       ctx.fillStyle = opts.diverging ? diverging(matrix[i][j], vmax) : sequential(matrix[i][j], vmax);
-      ctx.fillRect(j * cell, i * cell, cell, cell);
+      ctx.fillRect(mL + j * cell, mT + i * cell, cell, cell);
     }
     if (cell >= 9) {
       ctx.strokeStyle = "rgba(0,0,0,0.06)"; ctx.lineWidth = 0.5;
-      for (var gi = 0; gi <= n; gi++) { ctx.beginPath(); ctx.moveTo(0, gi * cell); ctx.lineTo(m * cell, gi * cell); ctx.stroke(); }
-      for (var gj = 0; gj <= m; gj++) { ctx.beginPath(); ctx.moveTo(gj * cell, 0); ctx.lineTo(gj * cell, n * cell); ctx.stroke(); }
+      for (var gi = 0; gi <= n; gi++) { ctx.beginPath(); ctx.moveTo(mL, mT + gi * cell); ctx.lineTo(mL + m * cell, mT + gi * cell); ctx.stroke(); }
+      for (var gj = 0; gj <= m; gj++) { ctx.beginPath(); ctx.moveTo(mL + gj * cell, mT); ctx.lineTo(mL + gj * cell, mT + n * cell); ctx.stroke(); }
     }
     if (opts.split) {
       ctx.strokeStyle = "rgba(60,60,60,0.45)"; ctx.lineWidth = 1.5;
-      ctx.beginPath(); ctx.moveTo(opts.split * cell, 0); ctx.lineTo(opts.split * cell, n * cell); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(0, opts.split * cell); ctx.lineTo(m * cell, opts.split * cell); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(mL + opts.split * cell, mT); ctx.lineTo(mL + opts.split * cell, mT + n * cell); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(mL, mT + opts.split * cell); ctx.lineTo(mL + m * cell, mT + opts.split * cell); ctx.stroke();
     }
-    if (opts.focusRow != null) { ctx.strokeStyle = "rgba(200,0,0,0.65)"; ctx.lineWidth = 2; ctx.strokeRect(0, opts.focusRow * cell, m * cell, cell); }
-    if (opts.focusCol != null) { ctx.strokeStyle = "rgba(200,0,0,0.65)"; ctx.lineWidth = 2; ctx.strokeRect(opts.focusCol * cell, 0, cell, n * cell); }
-    canvas._cell = cell; canvas._vmax = vmax;
+    if (opts.focusRow != null) { ctx.strokeStyle = "rgba(200,0,0,0.65)"; ctx.lineWidth = 2; ctx.strokeRect(mL, mT + opts.focusRow * cell, m * cell, cell); }
+    if (opts.focusCol != null) { ctx.strokeStyle = "rgba(200,0,0,0.65)"; ctx.lineWidth = 2; ctx.strokeRect(mL + opts.focusCol * cell, mT, cell, n * cell); }
+    
+    // SVG overlay for crisp text labels
+    if (opts.svgOverlay) {
+      var svg = opts.svgOverlay;
+      svg.innerHTML = "";
+      svg.setAttribute("viewBox", "0 0 " + canvas.width + " " + canvas.height);
+      svg.style.width = canvas.width + "px"; svg.style.height = canvas.height + "px";
+      function labClass(lbl, foc) { return "tgt-heat-lab " + (lbl && lbl.charAt(0) === "E" ? "edge" : "node") + (foc ? " foc" : ""); }
+      if (opts.colLabels) {
+        for (var cj = 0; cj < m; cj++) {
+          var tx = mL + cj * cell + cell / 2 + 3, ty = mT - 4;
+          var t1 = el("text", { x: tx, y: ty, class: labClass(opts.colLabels[cj], opts.focusCol === cj), transform: "rotate(-60 " + tx + " " + ty + ")" });
+          t1.textContent = opts.colLabels[cj]; svg.appendChild(t1);
+        }
+      }
+      if (opts.rowLabels) {
+        for (var ci = 0; ci < n; ci++) {
+          var t2 = el("text", { x: mL - 4, y: mT + ci * cell + cell / 2 + 3, class: labClass(opts.rowLabels[ci], opts.focusRow === ci), "text-anchor": "end" });
+          t2.textContent = opts.rowLabels[ci]; svg.appendChild(t2);
+        }
+      }
+    }
+    
+    canvas._cell = cell; canvas._mL = mL; canvas._mT = mT; canvas._vmax = vmax;
     return { cell: cell, vmax: vmax };
   }
   function colorbar(diverge) {
@@ -435,19 +462,52 @@
     return c;
   }
 
+  function buildSchematic(headsArr, l1cellsArr, activeL, activeH, resActive, activeEntireL) {
+    var schem = h("div", { class: "tgt-schem" });
+    var hLabs = h("div", { class: "tgt-schem-h-labs" });
+    for (var hi = 0; hi < 8; hi++) hLabs.appendChild(h("div", { class: "tgt-schem-h-lab", text: hi }));
+    schem.appendChild(hLabs);
+    for (var l = 3; l >= 0; l--) {
+      var row = h("div", { class: "tgt-schem-l" });
+      row.appendChild(h("div", { class: "tgt-schem-l-lab", text: "L" + l }));
+      for (var hi = 0; hi < 8; hi++) {
+        var cell = h("div", { class: "tgt-schem-h" });
+        if ((activeL === l && activeH === hi) || activeEntireL === l) cell.className = "tgt-schem-h active";
+        if (headsArr) headsArr.push({ l: l, h: hi, el: cell });
+        if (l1cellsArr && l === 1) l1cellsArr.push(cell);
+        row.appendChild(cell);
+      }
+      schem.appendChild(row);
+    }
+    if (resActive) {
+      var resRow = h("div", { class: "tgt-schem-l" });
+      resRow.appendChild(h("div", { class: "tgt-schem-l-lab", text: "res" }));
+      resRow.appendChild(h("div", { class: "tgt-schem-h active-res", style: "width:110px; height:4px;" }));
+      schem.appendChild(resRow);
+    }
+    return schem;
+  }
+
   /* =======================================================================
    * Demo 1 — Attention & identifier-matching explorer
    * ===================================================================== */
   function initAttention(root) {
     var fig = figure(root, "Attention & identifier matching");
     var controls = h("div", { class: "tgt-controls" });
+    
+    var heads = [];
+    var schem = buildSchematic(heads, null, null, null, false, null);
+    controls.appendChild(schem);
+
     var stage = h("div", { class: "tgt-stage" });
     var heatWrap = h("div", { class: "tgt-panel" });
     var graphWrap = h("div", { class: "tgt-panel" });
     var info = h("div", { class: "tgt-info" });
     var canvas = h("canvas", { class: "tgt-canvas" });
+    var svgOverlay = el("svg", { class: "tgt-heat-svg" });
+    var heatInner = h("div", { class: "tgt-heat-inner" }, [canvas, svgOverlay]);
     heatWrap.appendChild(h("div", { class: "tgt-cap", text: "token \u2192 token attention \u00b7 hover cells, click a node row" }));
-    heatWrap.appendChild(canvas);
+    heatWrap.appendChild(heatInner);
     graphWrap.appendChild(h("div", { class: "tgt-cap", text: "hover / drag nodes \u2014 overlay shows attention from the query node" }));
     stage.appendChild(heatWrap); stage.appendChild(graphWrap);
     fig.appendChild(controls); fig.appendChild(stage); fig.appendChild(info);
@@ -462,6 +522,7 @@
 
     function mat() { return state.data.attention[String(state.layer)][state.head]; }
     function tokLabel(i) { return state.data.tokens[i].label; }
+    function tokLabels() { return state.data.tokens.map(function (t) { return t.label; }); }
 
     function recompute() {
       if (!state.data) return;
@@ -474,8 +535,14 @@
         if (t.type === "edge") { state.edgeW[t.u + "-" + t.v] = M[q][idx]; if (t.u === q || t.v === q) incident += M[q][idx]; }
         else if (idx !== q) nodeMass += M[q][idx];
       });
-      drawHeatmap(canvas, M, { diverging: false, split: d.num_nodes, focusRow: q, focusCol: state.hoverCol });
+      drawHeatmap(canvas, M, { diverging: false, split: d.num_nodes, focusRow: q, focusCol: state.hoverCol, rowLabels: tokLabels(), colLabels: tokLabels(), svgOverlay: svgOverlay });
       if (state.view) state.view.redraw();
+      
+      heads.forEach(function (hc) {
+        if (hc.l === state.layer && hc.h === state.head) hc.el.className = "tgt-schem-h active";
+        else hc.el.className = "tgt-schem-h";
+      });
+
       // info
       info.innerHTML = "";
       var predStr = d.predictions.type === "node" ? (" \u00b7 label " + d.predictions.labels[q] + " / pred " + d.predictions.predictions[q]) : "";
@@ -487,23 +554,23 @@
 
     canvas.addEventListener("mousemove", function (ev) {
       if (!state.data) return;
-      var r = canvas.getBoundingClientRect(), cell = canvas._cell;
-      var j = Math.floor((ev.clientX - r.left) / (r.width / canvas.width) / cell);
-      var i = Math.floor((ev.clientY - r.top) / (r.height / canvas.height) / cell);
+      var r = canvas.getBoundingClientRect(), cell = canvas._cell, sc = r.width / canvas.width;
+      var j = Math.floor(((ev.clientX - r.left) / sc - canvas._mL) / cell);
+      var i = Math.floor(((ev.clientY - r.top) / sc - canvas._mT) / cell);
       var M = mat();
       if (i >= 0 && i < M.length && j >= 0 && j < M.length) {
         showTip(ev.clientX, ev.clientY, "q=" + tokLabel(i) + " &#8592; k=" + tokLabel(j) + " : <b>" + M[i][j].toFixed(3) + "</b>");
         var tk = state.data.tokens[j];
         state.hoverEdge = tk.type === "edge" ? { u: tk.u, v: tk.v } : null;
-        if (state.hoverCol !== j) { state.hoverCol = j; drawHeatmap(canvas, M, { diverging: false, split: state.data.num_nodes, focusRow: state.query, focusCol: j }); }
+        if (state.hoverCol !== j) { state.hoverCol = j; drawHeatmap(canvas, M, { diverging: false, split: state.data.num_nodes, focusRow: state.query, focusCol: j, rowLabels: tokLabels(), colLabels: tokLabels(), svgOverlay: svgOverlay }); }
         if (state.view) state.view.redraw();
       }
     });
     canvas.addEventListener("mouseleave", function () { hideTip(); state.hoverEdge = null; state.hoverCol = null; if (state.data) recompute(); });
     canvas.addEventListener("click", function (ev) {
       if (!state.data) return;
-      var r = canvas.getBoundingClientRect(), cell = canvas._cell;
-      var i = Math.floor((ev.clientY - r.top) / (r.height / canvas.height) / cell);
+      var r = canvas.getBoundingClientRect(), cell = canvas._cell, sc = r.height / canvas.height;
+      var i = Math.floor(((ev.clientY - r.top) / sc - canvas._mT) / cell);
       if (i >= 0 && i < state.data.num_nodes) { state.query = i; recompute(); }
     });
 
@@ -516,8 +583,8 @@
           onHover: function (i) { if (i != null && i < d.num_nodes) { state.query = i; recompute(); } },
           onSelect: function (i) { if (i != null && i < d.num_nodes) { state.query = i; recompute(); } },
           nodeStyle: function (i, hov) {
-            var c = nodePredColor(d, i), isQ = i === state.query;
-            return { r: isQ ? 10 : (hov ? 9 : 8), fill: c.fill, stroke: isQ ? "#c00" : c.stroke, sw: isQ ? 3 : 1.2, label: String(i), labelFill: "#1a2a4a" };
+            var isQ = i === state.query;
+            return { r: isQ ? 10 : (hov ? 9 : 8), fill: "#d0e4ff", stroke: isQ ? "#c00" : "#2a4a80", sw: isQ ? 3 : 1.2, label: String(i), labelFill: "#1a2a4a" };
           },
           edgeStyle: function (k, u, v) {
             var w = state.edgeW[u + "-" + v] || 0;
@@ -549,9 +616,13 @@
   function initSteering(root) {
     var fig = figure(root, "Degree-direction steering");
     var controls = h("div", { class: "tgt-controls" });
+    
+    var schem = buildSchematic(null, null, null, null, false, 0);
+    controls.appendChild(schem);
+
     var graphWrap = h("div", { class: "tgt-panel tgt-panel-wide" });
     var readout = h("div", { class: "tgt-info" });
-    graphWrap.appendChild(h("div", { class: "tgt-cap", text: "each node shows its predicted degree \u00b7 green = correct, red = wrong \u00b7 move the slider to steer" }));
+    graphWrap.appendChild(h("div", { class: "tgt-cap", text: "each node shows its predicted degree \u00b7 blue = correct, red = wrong \u00b7 move the slider to steer" }));
     fig.appendChild(controls); fig.appendChild(graphWrap); fig.appendChild(readout);
     var state = { data: null, ai: 0, view: null };
     var slider = h("input", { type: "range", min: "0", max: "24", value: "12", step: "1", class: "tgt-range" });
@@ -566,7 +637,7 @@
         onHover: function () { },
         nodeStyle: function (i, hov) {
           var row = d.rows[state.ai], pred = row.predictions[i], correct = pred === d.labels[i];
-          return { r: hov ? 11 : 10, fill: correct ? "#a8e6b8" : "#f5b0b0", stroke: correct ? "#1a7a30" : "#c00", sw: 1.4, label: String(pred), labelFill: "#123" };
+          return { r: hov ? 11 : 10, fill: correct ? "#d0e4ff" : "#f5b0b0", stroke: correct ? "#2a4a80" : "#c00", sw: 1.4, label: String(pred), labelFill: "#123" };
         },
         edgeStyle: function () { return { stroke: "#b0b8cc", width: 1.3 }; }
       });
@@ -595,9 +666,14 @@
   function initRing(root) {
     var fig = figure(root, "Ring membership \u2014 layer-1 ablation");
     var controls = h("div", { class: "tgt-controls" });
+    
+    var l1cells = [];
+    var schem = buildSchematic(null, l1cells, null, null, false, null);
+    controls.appendChild(schem);
+
     var graphWrap = h("div", { class: "tgt-panel tgt-panel-wide" });
     var readout = h("div", { class: "tgt-info" });
-    graphWrap.appendChild(h("div", { class: "tgt-cap", text: "border: indigo = ring, crimson = non-ring \u00b7 fill: green = correct, red = wrong \u00b7 ablate L1 with the slider" }));
+    graphWrap.appendChild(h("div", { class: "tgt-cap", text: "border: indigo = ring, crimson = non-ring \u00b7 fill: blue = correct, red = wrong \u00b7 ablate L1 with the slider" }));
     fig.appendChild(controls); fig.appendChild(graphWrap); fig.appendChild(readout);
     var state = { data: null, si: 0, view: null };
     var slider = h("input", { type: "range", min: "0", max: "10", value: "0", step: "1", class: "tgt-range" });
@@ -611,7 +687,7 @@
         onHover: function () { },
         nodeStyle: function (i, hov) {
           var row = d.rows[state.si], pred = row.predictions[i], ring = d.labels[i] === 1, correct = pred === d.labels[i];
-          return { r: hov ? 11 : 9, fill: correct ? "#a8e6b8" : "#f5b0b0", stroke: ring ? C_INDIGO : C_CRIMSON, sw: 2.6, label: null };
+          return { r: hov ? 11 : 9, fill: correct ? "#d0e4ff" : "#f5b0b0", stroke: ring ? C_INDIGO : C_CRIMSON, sw: 2.6, label: null };
         },
         edgeStyle: function () { return { stroke: "#b0b8cc", width: 1.3 }; }
       });
@@ -627,6 +703,10 @@
       if (!state.data) return;
       var d = state.data, row = d.rows[state.si];
       slider.value = state.si; state.view.redraw();
+      
+      var op = 1 - row.ablation_strength;
+      l1cells.forEach(function (c) { c.style.background = "rgba(165,0,52," + (1 - op) + ")"; c.style.borderColor = op < 0.5 ? "var(--tgt-crimson)" : "#d0d0d8"; });
+
       readout.innerHTML = "";
       readout.appendChild(h("span", { class: "tgt-stat", html: "ablation <b>" + row.ablation_strength.toFixed(1) + "</b>" }));
       readout.appendChild(h("span", { class: "tgt-stat", html: "overall <b>" + (row.overall_accuracy * 100).toFixed(0) + "%</b>" }));
@@ -640,10 +720,15 @@
    * ===================================================================== */
   function initSPD(root) {
     var fig = figure(root, "Shortest-path L2:H2 routing");
+    var controls = h("div", { class: "tgt-controls" });
+    
+    var schem = buildSchematic(null, null, 2, 2, false, null);
+    controls.appendChild(schem);
+
     var graphWrap = h("div", { class: "tgt-panel tgt-panel-wide" });
     var readout = h("div", { class: "tgt-info" });
     graphWrap.appendChild(h("div", { class: "tgt-cap", text: "arrows = L2:H2 top-1 attention \u00b7 each node points to its BFS parent toward the root (gold) \u00b7 drag to explore" }));
-    fig.appendChild(graphWrap); fig.appendChild(readout);
+    fig.appendChild(controls); fig.appendChild(graphWrap); fig.appendChild(readout);
     var state = { data: null, view: null };
 
     getJSON("spd_bfs.json").then(function (d) {
@@ -684,12 +769,20 @@
   function initQK(root) {
     var fig = figure(root, "QK identifier-matching matrices");
     var controls = h("div", { class: "tgt-controls" });
+    
+    var heads = [];
+    var schem = buildSchematic(heads, null, null, null, false, null);
+    controls.appendChild(schem);
+
     var panel = h("div", { class: "tgt-panel" });
     var readout = h("div", { class: "tgt-info" });
     var canvas = h("canvas", { class: "tgt-canvas" });
     panel.appendChild(h("div", { class: "tgt-cap", text: "QK score \u00b7 query identifier (row) \u00d7 key identifier (col) \u00b7 hover to inspect" }));
     panel.appendChild(canvas);
-    var cbar = h("div", { class: "tgt-cbar" }, [h("span", { class: "tgt-legend-t", text: "\u2212" }), colorbar(true), h("span", { class: "tgt-legend-t", text: "+" })]);
+    var cbLo = h("span", { class: "tgt-legend-t", text: "–" });
+    var cbMid = h("span", { class: "tgt-legend-t", text: "0" });
+    var cbHi = h("span", { class: "tgt-legend-t", text: "+" });
+    var cbar = h("div", { class: "tgt-cbar" }, [colorbar(true), h("div", { class: "tgt-cbar-ticks" }, [cbLo, cbMid, cbHi])]);
     panel.appendChild(cbar);
     fig.appendChild(controls); fig.appendChild(panel); fig.appendChild(readout);
     var state = { task: "spd", head: 5, channel: "vu", data: null, hover: null };
@@ -714,13 +807,20 @@
 
     function paint() {
       var e = entry(); if (!e) return;
-      drawHeatmap(canvas, e.matrix, { diverging: true, cell: 11, focusRow: state.hover ? state.hover.i : null, focusCol: state.hover ? state.hover.j : null });
+      var res = drawHeatmap(canvas, e.matrix, { diverging: true, cell: 11, focusRow: state.hover ? state.hover.i : null, focusCol: state.hover ? state.hover.j : null });
+      cbLo.textContent = "−" + res.vmax.toFixed(3); cbHi.textContent = "+" + res.vmax.toFixed(3);
     }
     function render() {
       var e = entry();
       readout.innerHTML = "";
       if (!e) { readout.appendChild(h("span", { class: "tgt-hint", text: "no matrix for this head/channel" })); return; }
       state.hover = null; paint();
+      
+      heads.forEach(function (hc) {
+        if (hc.l === e.layer && hc.h === e.head) hc.el.className = "tgt-schem-h active";
+        else hc.el.className = "tgt-schem-h";
+      });
+
       readout.appendChild(h("span", { class: "tgt-stat", html: "L" + e.layer + ":H" + e.head + " \u00b7 channel <b>" + state.channel + "</b>" }));
       readout.appendChild(h("span", { class: "tgt-stat", html: "selectivity <b>" + e.selectivity.toFixed(2) + "</b>" }));
       readout.appendChild(h("span", { class: "tgt-hint", text: "a bright indigo diagonal indicates an identifier-equality (identity) test" }));
