@@ -284,16 +284,17 @@ Presentations are managed in `_data/presentations.yml`.
 
 ### Structure
 
-The file has three sections:
+The file has four sections:
 
 1. **seminar_series** - Featured seminar series (shown at top)
-2. **external** - External presentations (conferences, invited talks)
-3. **internal** - Internal presentations (lab meetings, reading groups)
+2. **conference_seminars** - Conference talks, seminars, and similar external presentations
+3. **lgai** - Presentations at LG AI
+4. **yonsei** - Presentations at Yonsei
 
-### Adding an External Presentation
+### Adding a Conference/Seminar Presentation
 
 ```yaml
-external:
+conference_seminars:
   - title: "Your Presentation Title"
     event: "Conference/Event Name"
     year: 2025
@@ -315,10 +316,25 @@ external:
         url: "/blog/YYYY/post-name/"
 ```
 
-### Adding an Internal Presentation
+### Adding an LGAI Presentation
 
 ```yaml
-internal:
+lgai:
+  - title: "Your Presentation Title"
+    event: "LG AI Internal Seminar"
+    year: 2026
+    description: >
+      Description of the presentation and context.
+    materials:
+      - type: slides
+        title: "Presentation Slides"
+        url: "/assets/pdf/your_slides.pdf"
+```
+
+### Adding a Yonsei Presentation
+
+```yaml
+yonsei:
   items:
     - title: "Topic Name"
       description: >

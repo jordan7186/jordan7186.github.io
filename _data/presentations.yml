@@ -33,15 +33,16 @@ seminar_series:
       title: "Session 7: Explainable graph neural networks"
       url: "/assets/pdf/[GIST]07_Explainable_graph_neural_networks.pdf"
 
-external:
-  - title: "Towards understanding the connection between GNNs and the Weisfeiler-Lehman test"
-    event: "LG AI Internal Seminar" 
+conference_seminars:
+  - title: "Discovering Mechanisms in Tokenized Graph Transformers"
+    event: "Mechanistic Interpretability Workshop"
     year: 2026
-    description: "An introductory seminar on relationship between Graph Neural Networks and the Weisfeiler-Lehman test."
+    description: >
+      Poster presented at the Mechanistic Interpretability Workshop at ICML 2026. The paper can be found <a href="https://openreview.net/pdf?id=0WEuCiokZq">here</a>.
     materials:
-      - title: "Slides"
-        url: /assets/pdf/[LGAI]Towards_understanding_GNN_WL.pdf
-        type: "slides"
+      - type: poster
+        title: "Discovering Mechanisms in Tokenized Graph Transformers"
+        url: "/assets/pdf/729_Poster_MechInterp_Workshop.pdf"
 
   - title: "A Practical Introduction to (Explainable) Graph Learning"
     event: "Ewha Womans University"
@@ -110,8 +111,17 @@ external:
         title: "Edgeless-GNN: Unsupervised Inductive Edgeless Network Embedding"
         url: "/assets/pdf/EdgelessGNN_Hutech.pdf"
 
+lgai:
+  - title: "Towards understanding the connection between GNNs and the Weisfeiler-Lehman test"
+    event: "LG AI Internal Seminar" 
+    year: 2026
+    description: "An introductory seminar on relationship between Graph Neural Networks and the Weisfeiler-Lehman test."
+    materials:
+      - title: "Slides"
+        url: /assets/pdf/[LGAI]Towards_understanding_GNN_WL.pdf
+        type: "slides"
 
-internal:
+yonsei:
   description: >
     In my lab, we have a weekly reading group where we present papers of our own interest. 
     Here are some of the selected presentations that I have made in the reading group.
