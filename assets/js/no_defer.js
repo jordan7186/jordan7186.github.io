@@ -1,3 +1,6 @@
+document.documentElement.removeAttribute("data-theme");
+localStorage.setItem("theme", "light");
+
 // add bootstrap classes to tables
 $(document).ready(function() {
   $('table').each(function() {
@@ -19,4 +22,3 @@ $(document).ready(function() {
     }
   })
 });
-

@@ -26,13 +26,7 @@ $(document).ready(function() {
   cssLink.rel   = "stylesheet";
   cssLink.type  = "text/css";
 
-  let theme = localStorage.getItem("theme");
-  if (theme == null || theme == "null") {
-    const userPref = window.matchMedia;
-    if (userPref && userPref("(prefers-color-scheme: dark)").matches) {
-      theme = "dark";
-    }
-  }
+  let theme = "light";
 
   $('.jupyter-notebook-iframe-container iframe').each(function() {
     $(this).contents().find("head").append(cssLink);
@@ -46,4 +40,3 @@ $(document).ready(function() {
     }
   });
 });
-
