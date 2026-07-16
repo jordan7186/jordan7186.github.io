@@ -136,7 +136,7 @@ This demo shows the L2:H2's routing behavior for the shortest path distance task
 
 ## QK identifier matrices
 
-_Placeholder._ Query–key weights implement identifier-equality tests.
+This demo demonstrates how the model's ID matching mechanism works. For this demo, we only show the QK matrices when the ID vectors are used as queries and keys, which does not showcase the full routing behavior of the model but is sufficient to show the ID matching pattern. The QK values show that the model has learned to match the IDs of the nodes by assigning much higher scores to the same ID. Essentially, it creates a soft identity matrix, which allows the model to be much more flexible in matching the IDs even when the number of ID vectors used during training is larger than the dimension of the ID vectors. 
 
 <div data-tgt-demo="qk" style="min-height:360px"></div>
 
